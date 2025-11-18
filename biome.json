@@ -1,0 +1,103 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": {
+					"level": "on",
+					"options": {
+						"groups": [
+							[
+								":NODE:",
+								":BUN:",
+								":URL:",
+								":PACKAGE_WITH_PROTOCOL:",
+								":PACKAGE:"
+							],
+							":BLANK_LINE:",
+							["@iapacte/**", ":ALIAS:", ":PATH:"]
+						]
+					}
+				}
+			}
+		}
+	},
+	"css": {
+		"formatter": {
+			"enabled": true
+		},
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"complexity": {
+				"noStaticOnlyClass": "off"
+			},
+			"correctness": {
+				"useExhaustiveDependencies": "warn",
+				"useUniqueElementIds": "warn"
+			},
+			"recommended": true,
+			"performance": {
+				"noAccumulatingSpread": "warn"
+			},
+			"style": {
+				"useLiteralEnumMembers": "off"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "warn",
+				"noConsole": "warn",
+				"noEmptyInterface": "warn",
+				"noExplicitAny": "warn",
+				"noShadowRestrictedNames": "warn"
+			}
+		}
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": false,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 80,
+		"lineEnding": "lf"
+	},
+	"html": {
+		"formatter": {
+			"enabled": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"arrowParentheses": "asNeeded",
+			"quoteStyle": "single",
+			"jsxQuoteStyle": "single",
+			"semicolons": "asNeeded"
+		}
+	},
+	"json": {
+		"parser": {
+			"allowComments": true
+		}
+	},
+	"files": {
+		"includes": [
+			"**",
+			"!./**/.output",
+			"!./**/.tamagui",
+			"!./**/.tanstack",
+			"!./**/dist",
+			"!./**/node_modules",
+			"!flake.lock",
+			"!flake.nix"
+		],
+		"ignoreUnknown": true
+	},
+	"vcs": {
+		"enabled": true,
+		"useIgnoreFile": true,
+		"clientKind": "git"
+	}
+}

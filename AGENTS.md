@@ -1,0 +1,39 @@
+# Demo-Only Guidance
+
+## Purpose
+
+The iapacte_validations repository now exists strictly to craft UI-only demos inside `apps/web` for a single in-person sales and feedback session with city councils. Nothing ships to production, no backend calls are required, and every flow can run entirely offline on the presenter's laptop. All work should answer one question: *does this convince councils to adopt Iapacte?*
+
+## Demo Constraints
+
+- Build screens and interactions only in `apps/web`; disable or mock anything that implies real data processing.
+- Bundle every use case into one cohesive storyline so presenters can walk through the entire experience in one uninterrupted session.
+- Prioritize speed of iteration over technical depth: skip infrastructure, keep APIs stubbed, and lean on mock data fixtures that are easy to tweak shortly before the meeting.
+- Ensure the UI behaves deterministically offline to avoid surprises during the live walkthrough.
+- Catalan and Spanish language only.
+
+## Minimum Engineering Setup
+
+- Use the existing toolchain (Nix dev shell + pnpm v9 + React 19 + Tanstack Router + Effect Atom) but strip out unused dependencies where possible to keep installs fast.
+- The only command that must work flawlessly is `pnpm --filter @aipacto/apps-web dev`.
+- Keep lint (`pnpm lint`) and type checks (`pnpm check-types`) green so that rapid UI tweaks remain safe, even if the backend is mocked.
+
+## Core Demo Use Cases
+
+All demo tracks must showcase these pillars:
+
+1. **Data Collector** – an approachable grid (think Teable, NocoDB, Stackby, Baserow) that can read/write any municipal dataset: procurement DBs, open data portals, even auto-parsed local news feeds.
+2. **Tender & Grants** – a single repository for every tender, guideline, legal memo, and internal AI prompt doc so clerks never start from scratch.
+3. **AI Workflow Builder** – visual builders for AI + data-source pipelines that the chat UI can dynamically invoke depending on the conversation context.
+
+## Visual Direction
+
+- Maintain the MD3-inspired medieval aesthetic already defined in `apps/web/src/styles`, but exaggerate hierarchy so it reads clearly on a projector or screen share.
+- **CRITICAL: Always use CSS variables instead of Tailwind spacing/color tokens.** Use `var(--spacing-md)`, `var(--primary)`, `var(--font-size-body-l)`, etc. via Tailwind's arbitrary value syntax: `px-[var(--spacing-lg)]`, `text-[var(--primary)]`, `gap-[var(--spacing-md)]`.
+- **NEVER use Tailwind spacing tokens** like `p-md`, `gap-sm`, `px-lg`, `mt-xs`, `space-y-md`, etc. These bypass the design system.
+- **NEVER use Tailwind color tokens** like `text-primary`, `bg-surface-container`, `border-outline-variant`, etc. Always use `text-[var(--primary)]`, `bg-[var(--surface-container)]`, `border-[var(--outline-variant)]`.
+- **NEVER use Tailwind font-size tokens** like `text-body-l`, `text-title-m`, etc. Always use `text-[var(--font-size-body-l)]`, `text-[var(--font-size-title-m)]`.
+- All design tokens are defined in `apps/web/src/styles/global.css` (spacing, typography, layout) and `apps/web/src/styles/themes.css` (colors). Reference these files to see available variables.
+- Any motion should be purposeful and subtle; the goal is to guide attention, not to show technical prowess.
+- Remember the Tanstack Start SSR runtime drives `apps/web`; theme tokens and CSS variables live in `apps/web/src/styles/global.css` and `apps/web/src/styles/themes.css`, so confine visual tweaks there to keep demos consistent.
+- Responsive design: the demo should be responsive and work on all screen sizes.

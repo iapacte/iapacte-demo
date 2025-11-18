@@ -1,0 +1,34 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"build": {
+			"dependsOn": ["generate-paths", "^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": [".output/**/*", "dist/**/*", "types/**/*"]
+		},
+		"check-types": {
+			"dependsOn": ["generate-paths", "^build"],
+			"outputs": ["tsconfig.tsbuildinfo"]
+		},
+		"lint": {
+			"outputs": [],
+			"cache": true
+		},
+		"check-deps": {
+			"outputs": [],
+			"cache": true
+		},
+		"check-secrets": {
+			"outputs": [],
+			"cache": true
+		},
+		"generate-paths": {
+			"cache": false,
+			"outputs": ["packages/shared/typescript-config/base.json"]
+		},
+		"start": {
+			"cache": false,
+			"persistent": true
+		}
+	}
+}

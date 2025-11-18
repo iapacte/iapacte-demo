@@ -1,0 +1,15 @@
+{
+	"name": "@iapacte/shared-tsconfig",
+	"version": "0.0.1",
+	"description": "Shared tsconfig base for agentic_platform",
+	"type": "module",
+	"exports": {
+		"./base.json": "./base.json",
+		"./paths": "./tsconfig_paths.js",
+		"./ui.json": "./ui.json"
+	},
+	"scripts": {
+		"generate-paths": "node ./generate_monorepo_paths.js"
+	},
+	"private": true
+}

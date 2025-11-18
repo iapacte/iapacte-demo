@@ -1,0 +1,53 @@
+{
+	"name": "iapacte",
+	"version": "0.0.0",
+	"repository": "https://github.com/iapacte/iapacte-demo",
+	"packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
+	"engines": {
+		"node": ">=22",
+		"pnpm": ">=9"
+	},
+	"type": "module",
+	"scripts": {
+		"______ Development ______": "Run applications in development mode",
+		"web": "pnpm --filter @iapacte/apps-web web",
+		"chrome": "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --remote-debugging-port=9222 &",
+		"______ Build ______": "Build and run the monorepo",
+		"build": "DO_NOT_TRACK=1 TURBO_TELEMETRY_DISABLED=1 turbo run build --verbosity=2",
+		"______ Setup ______": "Project initialization",
+		"prepare": "lefthook install",
+		"generate-paths": "pnpm --filter @iapacte/shared-tsconfig generate-paths",
+		"______ Cleanup ______": "Clean project files and dependencies",
+		"clean-nodemodules": "rm -rf node_modules && rm -rf ./apps/*/node_modules && rm -rf ./packages/**/node_modules && pnpm store prune",
+		"______ Check ______": "Validate code and dependencies",
+		"check-deps": "syncpack list",
+		"check-secrets": "secretlint '**/*'",
+		"check-types": "turbo run check-types --affected",
+		"check-pr-title": "commitlint --edit",
+		"______ Lint ______": "Code quality tools",
+		"lint": "pnpm lint:biome && pnpm lint:compiler && pnpm lint:syncpack",
+		"lint:biome": "biome check --write --no-errors-on-unmatched",
+		"lint:compiler": "eslint 'apps/web/**/*.{ts,tsx}'",
+		"lint:syncpack": "syncpack format"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.6",
+		"@commitlint/cli": "^19.8.1",
+		"@commitlint/config-conventional": "^19.8.1",
+		"@drizzle-team/brocli": "^0.11.0",
+		"@iapacte/shared-tsconfig": "workspace:*",
+		"@secretlint/secretlint-rule-no-dotenv": "^9.3.2",
+		"@secretlint/secretlint-rule-preset-recommend": "^9.2.0",
+		"@types/node": "^24.0.15",
+		"@typescript-eslint/eslint-plugin": "^8.46.2",
+		"@typescript-eslint/parser": "^8.46.2",
+		"eslint": "^9.38.0",
+		"eslint-plugin-react-compiler": "19.1.0-rc.2",
+		"lefthook": "^1.11.12",
+		"secretlint": "^9.2.0",
+		"syncpack": "^13.0.2",
+		"tsdown": "^0.15.6",
+		"turbo": "^2.5.8",
+		"typescript": "5.8.3"
+	}
+}
