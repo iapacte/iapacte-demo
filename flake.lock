@@ -37,7 +37,8 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "unikraft-nur": "unikraft-nur"
       }
     },
     "systems": {
@@ -52,6 +53,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "unikraft-nur": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1760556023,
+        "narHash": "sha256-7axBXK+pxuBwp0t3NMyJRRQSps+YKdvF3opQD0ytwPE=",
+        "owner": "unikraft",
+        "repo": "nur",
+        "rev": "c19d4dede7f2258d7efabdec61cb3ce66984677c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "unikraft",
+        "repo": "nur",
         "type": "github"
       }
     }

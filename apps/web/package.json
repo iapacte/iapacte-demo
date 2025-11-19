@@ -8,7 +8,8 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"dev": "vite",
-		"start": "NITRO_PORT=3001 node .output/server/index.mjs",
+		"start": "node .output/server/index.mjs",
+		"start:local": "NITRO_PORT=3001 node .output/server/index.mjs",
 		"______ Others ______": "",
 		"check-types": "tsc --noEmit"
 	},

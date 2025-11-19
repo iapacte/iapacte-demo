@@ -1,13 +1,21 @@
-# Build web assets from the monorepo
-FROM node:24-alpine AS build
+# syntax=docker/dockerfile:1.7
 
-# Disable the problematic parallel IPv4/IPv6 connection attempts
+# Shared base image with pnpm configured
+FROM node:24-alpine AS base
+
 ENV NODE_OPTIONS=--no-network-family-autoselection
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 WORKDIR /repo
 
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+FROM base AS build
+
+ARG VITE_SERVER_URL="https://localhost:3000"
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
 
 COPY ./package.json ./pnpm-lock.yaml ./.npmrc ./pnpm-workspace.yaml ./
 COPY ./turbo.json ./
@@ -17,15 +25,26 @@ RUN sed -i 's/"prepare": "lefthook install"/"prepare": ""/' package.json
 COPY ./apps ./apps
 COPY ./packages ./packages
 
-RUN --mount=type=cache,target=/root/.pnpm-store CI=true pnpm install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.pnpm-store \
+	CI=true pnpm install --frozen-lockfile
 
-RUN DO_NOT_TRACK=1 TURBO_TELEMETRY_DISABLED=1 pnpm turbo run build --filter=@iapacte/apps-web
+RUN DO_NOT_TRACK=1 TURBO_TELEMETRY_DISABLED=1 \
+	pnpm turbo run build --filter=@iapacte/apps-web
 
-# For Tanstack SSR server
-FROM node:24-alpine
+# Runtime image for the TanStack Start SSR server
+FROM node:24-alpine AS runner
+
 ENV NODE_OPTIONS=--no-network-family-autoselection
-WORKDIR /app
-COPY --from=build /repo/apps/web/.output /app/.output
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV NITRO_PORT=3000
+ARG VITE_SERVER_URL="https://localhost:3000"
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+
+WORKDIR /app
+
+COPY --from=build /repo/apps/web/.output /app/.output
+
+EXPOSE 3000
+
 CMD ["node", ".output/server/index.mjs"]

@@ -1,6 +1,7 @@
 import { resolve } from 'node:path'
 import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import tailwindcss from '@tailwindcss/vite'
+import { nitroV2Plugin } from '@tanstack/nitro-v2-vite-plugin'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -38,6 +39,12 @@ export default defineConfig(() => ({
 			outdir: '../../packages/shared/ui/localization/src/paraglide',
 		}),
 		tanstackStart(),
+		...nitroV2Plugin({
+			preset: 'node-server',
+			output: {
+				dir: '.output',
+			},
+		}),
 		tsConfigPaths(),
 		react({
 			babel: {

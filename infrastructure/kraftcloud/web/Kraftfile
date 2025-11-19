@@ -1,0 +1,20 @@
+spec: v0.6
+
+name: iapacte-web
+
+runtime: base-compat:latest
+
+labels:
+  # Keep the demo instance always running; scale-to-zero can return "service not found" while waking.
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "off"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "false"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
+rootfs: ./Dockerfile.web
+
+cmd: ["node", "/app/.output/server/index.mjs"]
+
+env:
+  NODE_ENV: production
+  PORT: "3000"
+  NITRO_PORT: "3000"
