@@ -98,7 +98,7 @@ Run the deployment from the monorepo root so the Kraftfile can see `Dockerfile.w
 kraft cloud deploy \
   --kraftfile infrastructure/kraftcloud/web/Kraftfile \
   --subdomain "$SUBDOMAIN" \
-  -p 80:3000/http \
+  -p 80:443/http+redirect \
   -p 443:3000/http+tls \
   -M 1024M \
   .
