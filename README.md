@@ -1,78 +1,151 @@
-# Iapacte
+## Iapacte Unikraft Cloud Demo
 
-**Spanish**: For the Spanish version of this README, see [`README`](./docs/README_es.md).
+This repo packages our TanStack Start Nitro SSR web app as a Unikernel for Unikraft Cloud, with a matching Docker/Compose flow for local smoke tests. The monorepo hosts the demo UI in `apps/web` plus shared code in `packages/*`, with infrastructure assets under `infrastructure/`.
 
-Iapacte is building the Operating System for regional governments: a shared platform where city councils, public workers, and citizens collaborate with modern tooling, real-time AI assistants, and governed data. Everything we design is anchored in what administrations told us they struggle with today—duplication of work, brittle tooling, disconnected data, and no common base to build on.
+# TanStack Start on KraftCloud
 
-## Why Iapacte now?
+The `infrastructure/kraftcloud` tree packages the TanStack Start SSR demo (`apps/web`) so it can be previewed locally with Docker Compose and then pushed to the exact same container image on Unikraft Cloud. Follow this guide to ship the Nitro server behind a Kraft-managed TLS endpoint that matches the domain configured in your demo (`VITE_SERVER_URL`).
 
-- **Public impact first**: 8,000+ municipalities in Spain alone manage billions in annual spend, yet still rely on spreadsheets, email chains, and bespoke vendors. We are giving them a cohesive workspace they actually control.
-- **Reusable knowledge and processes**: Councils redo the same procedures every day. We package best practices so they can be shared, remixed, and executed safely across municipalities.
-- **Extensible core**: By treating Iapacte as an API-first OS, every department, vendor, or civic hacker can plug in workflows, data, and vertical apps without starting from scratch.
+## Table of Contents
 
-## Strategic pillars
+- [Overview](#overview)
+- [Directory Layout](#directory-layout)
+- [Prerequisites](#prerequisites)
+- [Local Smoke Test](#local-smoke-test)
+- [Kraft Cloud Deployment](#kraft-cloud-deployment)
+  - [Prepare the Environment](#prepare-the-environment)
+  - [Deploy to a Domain/Subdomain](#deploy-to-a-domainsubdomain)
+  - [Redeploy the Existing Service](#redeploy-the-existing-service)
+  - [Inspect & Troubleshoot](#inspect--troubleshoot)
+- [Reference](#reference)
 
-1. **Knowledge sharing and transfer**  
-   City halls reuse checklists, templates, workflows, and lessons learned from their peers instead of rebuilding them from scratch. A built-in discovery engine searches and recommends relevant experiences and projects from other organizations—articles, blogs, and case studies—across the country and abroad, helping teams learn fast and spark new collaborations.  
-   _Example: When Manresa needs a flood-response plan, it starts from Girona's approved template, swaps contact names, and ships the plan in minutes._
+## Overview
 
-2. **Dropbox-like document space**  
-   Institutional files, case folders, and archives live in one secure library with the right permissions baked in and instant links to workflows.  
-   _Example: The culture department drops the latest grant dossier into a shared folder and the inter-municipal review board can open it without chasing email attachments._
+- One source of truth: `Dockerfile.web` builds the TanStack Start SSR runtime that powers local Compose, Kraft Cloud, and the `pnpm --filter @iapacte/apps-web dev` workflow.
+- Deterministic settings: `.env` feeds both Docker Compose and Kraft Cloud so the public `VITE_SERVER_URL` always matches the hostname you deploy (important when routing the chat UI + SSR over the same domain).
+- Portable deployment: the Kraftfile reuses the exact build context from the monorepo root, exposes TLS on port `443`, and scales to zero between live demos.
 
-3. **Workflow automation for processes**  
-   Visual, reusable flows handle approvals, validations, and reminders so people focus on the meaningful steps.  
-   _Example: A social services caseworker triggers an onboarding flow that pre-fills paperwork, routes signatures to the secretary, and pings finance when funds must be released._
+## Directory Layout
 
-4. **Governed and accessible data**  
-   Spreadsheet-like tables feel familiar but connect to internal and external sources, track every change, and stay ready for AI.  
-   _Example: The mobility team merges traffic sensor feeds with manual counts in one table to auto-generate weekly dashboards for council meetings._
+- `apps/web` – TanStack Start SSR demo app used in the council storyline.
+- `packages/*` – shared UI and logic consumed by `apps/web`.
+- `Dockerfile.web` – multi-stage build for the Nitro SSR server published to Kraft Cloud.
+- `docker-compose.yaml` – local validation stack that reuses the same Dockerfile.
+- `infrastructure/kraftcloud/web/` – Kraft manifest plus optional Caddy rootfs assets.
+- `infrastructure/kraftcloud/.env.example` – shared environment template (`VITE_SERVER_URL`, `NODE_ENV`, `PORT`, `NITRO_PORT`).
 
-5. **Suite of specialized applications**  
-   Vertical apps sit on the shared core—tender writers, procurement comparators, contextual chats, or tools for contracting, urban planning, and social services.  
-   _Example: An urban planning squad uses the zoning comparison app to review how similar municipalities handled new tower proposals before they make a recommendation._
+## Prerequisites
 
-6. **API-first foundation**  
-   Every capability is exposed through APIs with fine-grained, ReBAC-style permissions so departments, contractors, and civic partners can extend the platform safely.  
-   _Example: A regional consortium plugs its citizen portal into Iapacte's permissions, letting contractors upload updates without creating extra logins._
+### Tooling
 
-7. **AI as a transversal layer**  
-   Intelligent assistance appears inside every module—drafting text, spotting missing steps, and suggesting next actions while respecting governance rules.  
-   _Example: While drafting a procurement report, the assistant suggests compliant language, links to referenced documents, and flags missing attachments before submission._
+1. Install Docker Desktop (Compose is bundled) and verify with `docker --version && docker compose version`.
+2. Install Nix (see [zero-to-nix](https://zero-to-nix.com/start/install/)) and enter the dev shell for consistent `pnpm`, `kraftkit`, and `openfga-cli` versions:
 
-_Summary: shared knowledge + documents + automation + governed data + vertical apps + API-first + AI everywhere._
+   ```bash
+   nix develop # or nix develop -c zsh
+   ```
 
-## First wave of applications
+### Cloud Auth
 
-### AI-powered procurement suite
+Export your Unikraft Cloud token and target metro before deploying:
 
-We started with public procurement because it impacts every department and exposes the gaps above.
+```bash
+export UKC_TOKEN="<your-kraftcloud-token>"
+export UKC_METRO=fra
+```
 
-- **Guided workflows**: Suggests approval paths, deadlines, and documentation packs so teams can move faster while staying auditable.
-- **Tender writer**: Generates compliant documents (specifications, evaluation criteria, award reports) using best-in-class municipal templates and aligned with Spanish procurement law.
+## Local Smoke Test
 
-### Upcoming vertical experiences
+Use Docker Compose to confirm the SSR build boots with your `.env` configuration.
 
-- Context-aware chat for staff and citizens, grounded on governed organizational data.
-- Collaborative knowledge spaces for policy drafts, grant applications, or shared municipal programs.
-- Automation kits for urban planning, social services, and infrastructure maintenance.
+```bash
+cp infrastructure/kraftcloud/.env.example infrastructure/kraftcloud/.env
+docker compose \
+  -f infrastructure/kraftcloud/docker-compose.yaml \
+  --env-file infrastructure/kraftcloud/.env \
+  up --build
+```
 
-## Architecture & tech stack
+The TanStack Start server listens on `http://localhost:3000` so you can verify the storyline locally before hitting Kraft Cloud.
 
-- **Clean Architecture + DDD** to keep municipal, infrastructure, and AI concerns decoupled.
-- **TypeScript everywhere** (Node ≥22, pnpm v9) with Effect 3 for structured concurrency and LangChain/LangGraph for agentic flows.
-- **Frontend**: React 19 + Vite 6 + TanStack Router (file-based) with Tailwind MD3 tokens, Base UI primitives, Motion.dev animations, and Effect Atom state stores.
-- **Backend**: Fastify services, governed storage, Qdrant/PostgreSQL for semantic + relational workloads, and ReBAC-ready auth.
-- **DevX**: Nix Flake pins the toolchain, Turbo powers multi-package builds, Biome enforces formatting/linting, and Paraglide manages localization across shared packages.
+## Kraft Cloud Deployment
 
-## Getting started
+### Prepare the Environment
 
-1. `nix develop` (or `direnv allow`) to enter the pinned toolchain.  
-2. `pnpm install && pnpm prepare` to install dependencies and Lefthook hooks.  
-3. Explore `apps/server`, `apps/web`, and the shared packages under `packages/` for domain logic, UI, and infrastructure.  
-4. Run `pnpm web` or `pnpm server` for local development, and `pnpm lint`, `pnpm check-types`, `pnpm build` before opening a PR.  
-5. Read the [Contributing Guide](./CONTRIBUTING.md) for coding standards, DDD boundaries, and PR expectations.
+1. Copy the env file and set `VITE_SERVER_URL` to the hostname you plan to use on Kraft Cloud (e.g. `https://demo.fra.unikraft.app`) without opening an editor:
 
-## License
+   ```bash
+   cp infrastructure/kraftcloud/.env.example infrastructure/kraftcloud/.env
+   export SUBDOMAIN=iapacte-demo         # pick any DNS-safe slug
+   export UKC_METRO=fra                 # change if you deploy elsewhere
+   export DOMAIN="$SUBDOMAIN.$UKC_METRO.unikraft.app"
+   perl -i -pe "s|^VITE_SERVER_URL=.*|VITE_SERVER_URL=https://$DOMAIN|" infrastructure/kraftcloud/.env
+   ```
 
-Licensed under the GNU Affero General Public License v3.0. See [LICENSE](./LICENSE.md) for full details.
+   Re-run the `export` lines whenever you open a new shell; only `VITE_SERVER_URL` is stored inside `.env`.
+
+2. Load the env vars whenever you deploy:
+
+   ```bash
+   set -a; . infrastructure/kraftcloud/.env; set +a
+   ```
+
+3. (Optional) warm up the build output to catch failures early:
+
+   ```bash
+   pnpm turbo run build --filter=@iapacte/apps-web
+   ```
+
+### Deploy to a Domain/Subdomain
+
+Run the deployment from the monorepo root so the Kraftfile can see `Dockerfile.web`. Reuse the `SUBDOMAIN`/`UKC_METRO` exports from the preparation step (export them again if you started a new shell).
+
+```bash
+kraft cloud deploy \
+  --kraftfile infrastructure/kraftcloud/web/Kraftfile \
+  --subdomain "$SUBDOMAIN" \
+  -p 80:443/http+redirect \
+  -p 443:3000/http+tls \
+  -M 1024M \
+  .
+```
+
+- `--subdomain` provisions `https://$SUBDOMAIN.$UKC_METRO.unikraft.app` automatically; replace with `--domain your-domain.com` when delegating a custom domain.
+- The TLS endpoint on `443` is what `apps/web` expects; updating `VITE_SERVER_URL` keeps client + server on the same origin so cookies and SSR data stay in sync.
+
+### Redeploy the Existing Service
+
+If the service already exists, redeploy in-place instead of grabbing a new subdomain:
+
+```bash
+SERVICE_NAME=$(kraft cloud service ls --metro "$UKC_METRO" | awk '/iapacte-web/{print $1; exit}')
+
+set -a; . infrastructure/kraftcloud/.env; set +a
+kraft cloud deploy \
+  --kraftfile infrastructure/kraftcloud/web/Kraftfile \
+  --service "$SERVICE_NAME" \
+  --rollout remove \
+  -M 1024M \
+  .
+```
+
+Skip `-p`/`--subdomain` flags while redeploying; the existing service retains its ports and hostname.
+
+### Inspect & Troubleshoot
+
+- View running services/instances: `kraft cloud service ls --metro $UKC_METRO` and `kraft cloud instance ls --metro $UKC_METRO`.
+- Tail logs: `kraft cloud instance logs <instance> --metro $UKC_METRO`.
+- Remove old artifacts when you are done rehearsing: `kraft cloud service remove <service> --metro $UKC_METRO`.
+- When the endpoint is live, verify health from your laptop or CI:
+
+  ```bash
+  curl -i "https://$DOMAIN/health"
+  ```
+
+  (Replace `/health` with whichever Nitro route you expose.)
+
+## Reference
+
+- Unikraft CLI install guide: <https://unikraft.org/docs/cli/install>
+- Kraft Cloud product docs: <https://unikraft.org/docs/cloud/>
+- TanStack Start docs: <https://tanstack.com/start/latest>
