@@ -10,9 +10,9 @@ export type WorkflowDefinition = {
 	edges: FlowEdge[]
 }
 
-const civicSecondary = 'var(--md3-sys-color-secondary)'
-const civicPrimary = 'var(--md3-sys-color-primary)'
-const civicTertiary = 'var(--md3-sys-color-tertiary)'
+const civicSecondary = 'var(--secondary)'
+const civicPrimary = 'var(--primary)'
+const civicTertiary = 'var(--tertiary)'
 
 const tenderScrutinizerNodes: FlowNode[] = [
 	{

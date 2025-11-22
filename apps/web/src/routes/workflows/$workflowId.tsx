@@ -47,7 +47,7 @@ function WorkflowDetail() {
 				</ul>
 			</div>
 
-			<div className='h-[70vh] rounded-[var(--radius-xl)] border border-[var(--outline-variant)] bg-[var(--surface-container)] p-[var(--spacing-md)]'>
+			<div className='rounded-[var(--radius-xl)] border border-[var(--outline-variant)] bg-[var(--surface-container)] overflow-hidden'>
 				<PageComponent
 					initialNodes={workflow.nodes}
 					initialEdges={workflow.edges}

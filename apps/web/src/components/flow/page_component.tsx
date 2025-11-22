@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import 'reactflow/dist/style.css'
 import {
 	addEdge,
 	Background,
 	type Connection,
 	type Edge,
-	MiniMap,
 	type Node,
 	ReactFlow,
 	type ReactFlowInstance,
@@ -18,6 +17,7 @@ import CanvasControls from './canvas_controls'
 import ConnectionLine from './connection_line'
 import CustomEdge from './custom_edge'
 import CustomNode, { type CustomNodeData } from './custom_node'
+import { calculateLayoutBounds, getLayoutedElements } from './layout'
 
 type NodeData = CustomNodeData
 type EdgeData = { accentColor?: string }
@@ -57,7 +57,7 @@ const DEFAULT_NODES: FlowNode[] = [
 				{
 					id: 'loader-output-documents',
 					label: 'Documents',
-					color: 'var(--md3-sys-color-secondary)',
+					color: 'var(--secondary)',
 				},
 			],
 		},
@@ -72,12 +72,12 @@ const DEFAULT_NODES: FlowNode[] = [
 			status: 'Idle',
 			description:
 				'Generates civic-focused embeddings to power semantic search.',
-			accentColor: 'var(--md3-sys-color-tertiary)',
+			accentColor: 'var(--tertiary)',
 			inputs: [
 				{
 					id: 'embedding-input-documents',
 					label: 'Documents',
-					color: 'var(--md3-sys-color-secondary)',
+					color: 'var(--secondary)',
 				},
 			],
 			parameters: [
@@ -99,7 +99,7 @@ const DEFAULT_NODES: FlowNode[] = [
 				{
 					id: 'embedding-output-vector',
 					label: 'Vectors',
-					color: 'var(--md3-sys-color-primary)',
+					color: 'var(--primary)',
 				},
 			],
 		},
@@ -113,17 +113,17 @@ const DEFAULT_NODES: FlowNode[] = [
 			icon: '🏛️',
 			status: 'Awaiting prompt',
 			description: 'Delivers contextual answers for councillors and citizens.',
-			accentColor: 'var(--md3-sys-color-secondary)',
+			accentColor: 'var(--secondary)',
 			inputs: [
 				{
 					id: 'qa-input-vector',
 					label: 'Vectors',
-					color: 'var(--md3-sys-color-primary)',
+					color: 'var(--primary)',
 				},
 				{
 					id: 'qa-input-question',
 					label: 'Question',
-					color: 'var(--md3-sys-color-secondary)',
+					color: 'var(--secondary)',
 				},
 			],
 			parameters: [
@@ -135,7 +135,7 @@ const DEFAULT_NODES: FlowNode[] = [
 				{
 					id: 'qa-output-answer',
 					label: 'Answer',
-					color: 'var(--md3-sys-color-tertiary)',
+					color: 'var(--tertiary)',
 				},
 			],
 		},
@@ -148,7 +148,7 @@ const DEFAULT_NODES: FlowNode[] = [
 			title: 'Citizen Prompt',
 			icon: '💬',
 			status: 'Live input',
-			accentColor: 'var(--md3-sys-color-secondary)',
+			accentColor: 'var(--secondary)',
 			parameters: [
 				{
 					id: 'prompt-template',
@@ -161,7 +161,7 @@ const DEFAULT_NODES: FlowNode[] = [
 				{
 					id: 'prompt-output-question',
 					label: 'Question',
-					color: 'var(--md3-sys-color-secondary)',
+					color: 'var(--secondary)',
 				},
 			],
 		},
@@ -177,7 +177,7 @@ const DEFAULT_EDGES: FlowEdge[] = [
 		targetHandle: 'embedding-input-documents',
 		type: 'custom',
 		animated: true,
-		data: { accentColor: 'var(--md3-sys-color-secondary)' },
+		data: { accentColor: 'var(--secondary)' },
 	},
 	{
 		id: 'edge-embedding-qa',
@@ -186,7 +186,7 @@ const DEFAULT_EDGES: FlowEdge[] = [
 		target: 'qa',
 		targetHandle: 'qa-input-vector',
 		type: 'custom',
-		data: { accentColor: 'var(--md3-sys-color-primary)' },
+		data: { accentColor: 'var(--primary)' },
 	},
 	{
 		id: 'edge-prompt-qa',
@@ -195,7 +195,7 @@ const DEFAULT_EDGES: FlowEdge[] = [
 		target: 'qa',
 		targetHandle: 'qa-input-question',
 		type: 'custom',
-		data: { accentColor: 'var(--md3-sys-color-secondary)' },
+		data: { accentColor: 'var(--secondary)' },
 	},
 ]
 
@@ -218,28 +218,47 @@ export function PageComponent({
 	const { isDark } = useThemePreference()
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null)
+	const flowWrapperRef = useRef<HTMLDivElement | null>(null)
+	const [flowHeight, setFlowHeight] = useState<number | null>(null)
+	const [isFullscreen, setIsFullscreen] = useState(false)
 
-	const memoizedNodes = useMemo<FlowNode[]>(
-		() => cloneData(initialNodes),
-		[initialNodes],
+	const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>(
+		cloneData(initialNodes),
 	)
-	const memoizedEdges = useMemo<FlowEdge[]>(
-		() => cloneData(initialEdges),
-		[initialEdges],
+	const [edges, setEdges, onEdgesChange] = useEdgesState<EdgeData>(
+		cloneData(initialEdges),
 	)
-
-	const [nodes, setNodes, onNodesChange] =
-		useNodesState<NodeData>(memoizedNodes)
-	const [edges, setEdges, onEdgesChange] =
-		useEdgesState<EdgeData>(memoizedEdges)
 
 	useEffect(() => {
-		setNodes(cloneData(initialNodes))
-	}, [initialNodes, setNodes])
+		// Auto-layout and fit the graph whenever the source data changes
+		const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+			cloneData(initialNodes),
+			cloneData(initialEdges),
+			{
+				direction: 'LR',
+				nodeSpacing: { x: 150, y: 100 },
+			},
+		)
+		setNodes(layoutedNodes)
+		setEdges(layoutedEdges)
+		const { height } = calculateLayoutBounds(layoutedNodes)
+		setFlowHeight(Math.max(height + 64, 420))
+
+		if (reactFlowInstance) {
+			setTimeout(() => {
+				reactFlowInstance.fitView({ padding: 0.2, duration: 300 })
+			}, 0)
+		}
+	}, [initialNodes, initialEdges, reactFlowInstance, setEdges, setNodes])
 
 	useEffect(() => {
-		setEdges(cloneData(initialEdges))
-	}, [initialEdges, setEdges])
+		const handleFullscreenChange = () => {
+			setIsFullscreen(Boolean(document.fullscreenElement))
+		}
+		document.addEventListener('fullscreenchange', handleFullscreenChange)
+		return () =>
+			document.removeEventListener('fullscreenchange', handleFullscreenChange)
+	}, [])
 
 	const backgroundVars = useMemo(
 		() => ({
@@ -252,18 +271,19 @@ export function PageComponent({
 	)
 
 	const onConnect = useCallback(
-		(connection: Connection) =>
-			setEdges(current =>
-				addEdge(
-					{
-						...connection,
-						type: 'custom',
-						data: { accentColor: 'var(--primary)' },
-					},
-					current,
-				),
-			),
-		[setEdges],
+		(connection: Connection) => {
+			// React Flow gives us a draft edge; we wrap it with our style
+			const newEdges = addEdge(
+				{
+					...connection,
+					type: 'custom',
+					data: { accentColor: 'var(--primary)' },
+				},
+				edges,
+			)
+			setEdges(newEdges)
+		},
+		[edges, setEdges],
 	)
 
 	const handleDrop = useCallback(
@@ -271,6 +291,7 @@ export function PageComponent({
 			event.preventDefault()
 			if (!reactFlowInstance) return
 
+			// Convert screen coords to canvas coords so dropped nodes land where expected
 			const position = reactFlowInstance.screenToFlowPosition({
 				x: event.clientX,
 				y: event.clientY,
@@ -285,7 +306,7 @@ export function PageComponent({
 					title: 'Draft Component',
 					icon: '✨',
 					status: 'Sketch',
-					accentColor: 'var(--md3-sys-color-tertiary)',
+					accentColor: 'var(--tertiary)',
 					parameters: [
 						{
 							id: `${nodeId}-note`,
@@ -307,18 +328,47 @@ export function PageComponent({
 		event.dataTransfer.dropEffect = 'copy'
 	}, [])
 
+	const handleLayoutAndFit = useCallback(() => {
+		// Relayout current graph (useful after edits) and refit the viewport
+		const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+			cloneData(nodes),
+			cloneData(edges),
+			{
+				direction: 'LR',
+				nodeSpacing: { x: 150, y: 100 },
+			},
+		)
+		setNodes(layoutedNodes)
+		setEdges(layoutedEdges)
+		const { height } = calculateLayoutBounds(layoutedNodes)
+		setFlowHeight(Math.max(height + 64, 420))
+		if (reactFlowInstance) {
+			reactFlowInstance.fitView({ padding: 0.24, duration: 200 })
+		}
+	}, [edges, nodes, reactFlowInstance, setEdges, setNodes])
+
+	const computedHeight = isFullscreen ? '100vh' : `${flowHeight ?? 520}px`
+
+	const handleFullscreenToggle = useCallback(() => {
+		if (isFullscreen) {
+			document.exitFullscreen().catch(() => undefined)
+			return
+		}
+		if (flowWrapperRef.current?.requestFullscreen) {
+			flowWrapperRef.current.requestFullscreen().catch(() => undefined)
+		}
+	}, [isFullscreen])
+
 	return (
-		<div className='grid h-screen w-full grid-rows-[auto_1fr] bg-surface text-on-surface'>
+		<div
+			className='grid w-full grid-rows-[1fr] bg-[var(--surface)] text-[var(--on-surface)]'
+			style={{ height: computedHeight }}
+		>
 			<div
-				className='grid grid-cols-[1fr_auto_1fr] items-center gap-md border-b border-outline-variant bg-surface px-lg py-sm'
-				role='toolbar'
-				aria-label='Flow toolbar'
+				className='relative h-full w-full'
+				ref={flowWrapperRef}
+				style={{ ...backgroundVars, minHeight: '360px' }}
 			>
-				<div className='min-h-8' />
-				<div className='min-h-8' />
-				<div className='min-h-8' />
-			</div>
-			<div className='relative h-full w-full' style={backgroundVars}>
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -328,14 +378,17 @@ export function PageComponent({
 					onNodesChange={onNodesChange}
 					onEdgesChange={onEdgesChange}
 					onConnect={onConnect}
-					onInit={(instance: ReactFlowInstance) =>
+					onInit={(instance: ReactFlowInstance) => {
 						setReactFlowInstance(instance)
-					}
+						// Fit view after layout is applied
+						setTimeout(() => {
+							instance.fitView({ padding: 0.2, duration: 0 })
+						}, 0)
+					}}
 					onDrop={handleDrop}
 					onDragOver={handleDragOver}
 					connectionLineComponent={ConnectionLine}
 					proOptions={{ hideAttribution: true }}
-					fitView
 					className='h-full w-full'
 				>
 					<Background
@@ -345,8 +398,10 @@ export function PageComponent({
 						color='var(--rf-background-dot-color)'
 						style={{ backgroundColor: 'var(--rf-background-color)' }}
 					/>
-					<MiniMap pannable zoomable />
-					<CanvasControls />
+					<CanvasControls
+						onFit={handleLayoutAndFit}
+						onFullscreen={handleFullscreenToggle}
+					/>
 				</ReactFlow>
 			</div>
 		</div>

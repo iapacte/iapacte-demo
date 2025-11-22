@@ -19,6 +19,7 @@ export function Handle({
 	style,
 	...rest
 }: Props) {
+	// Let callers override the color; fall back to theme primary
 	const resolvedColor =
 		accentColor ??
 		(style as HandleStyle | undefined)?.['--handle-color'] ??
@@ -31,7 +32,7 @@ export function Handle({
 	return (
 		<RFHandle
 			className={[
-				'group/handle relative h-0 w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+				'group/handle relative h-0 w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40',
 				className,
 			]
 				.filter(Boolean)

@@ -53,7 +53,7 @@ export function CoLanguageSelector() {
 			items={languageOptions}
 			value={currentLanguage}
 			onValueChange={value =>
-				handleLanguageChange(value as ListSupportedLanguagesCodes | 'auto')
+				handleLanguageChange(value as ListSupportedLanguagesCodes)
 			}
 		>
 			<Select.Trigger

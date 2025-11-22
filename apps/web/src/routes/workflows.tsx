@@ -1,8 +1,20 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import {
+	createFileRoute,
+	Link,
+	Outlet,
+	useLocation,
+} from '@tanstack/react-router'
 
 import { workflows } from '~lib'
 
 function WorkflowGallery() {
+	const location = useLocation()
+	const isDetailPage = location.pathname !== '/workflows'
+
+	if (isDetailPage) {
+		return <Outlet />
+	}
+
 	return (
 		<section className='px-[var(--spacing-lg)] py-[var(--spacing-xl)] flex flex-col gap-[var(--spacing-lg)]'>
 			<div className='space-y-[var(--spacing-xs)] max-w-3xl'>

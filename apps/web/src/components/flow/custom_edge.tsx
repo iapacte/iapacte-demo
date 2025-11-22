@@ -30,8 +30,12 @@ export function CustomEdge(props: EdgeProps<CustomEdgeData>) {
 		<BaseEdge
 			id={id}
 			path={edgePath}
-			markerEnd={markerEnd}
-			style={{ stroke: accentColor ?? 'var(--outline)', strokeWidth: 2 }}
+			markerEnd={markerEnd ?? ''}
+			// Keep the edge stroke in sync with the upstream node/handle accent color
+			style={{
+				stroke: accentColor ?? 'var(--outline)',
+				strokeWidth: 2,
+			}}
 		/>
 	)
 }

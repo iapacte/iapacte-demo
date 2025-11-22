@@ -35,7 +35,7 @@ export function NotFound(_: NotFoundRouteProps) {
 					Workflow Studio
 				</Link>
 				<Link
-					to='/civic-spreadsheet'
+					to='/data'
 					className='inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--primary)] px-[var(--spacing-md)] py-[var(--spacing-xs)] font-medium text-[var(--primary)] hover:bg-[var(--surface-container)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]'
 				>
 					Civic Spreadsheet

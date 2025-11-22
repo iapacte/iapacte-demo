@@ -13,6 +13,7 @@ The iapacte_validations repository now exists strictly to craft UI-only demos in
 - Bundle every use case into one cohesive storyline so presenters can walk through the entire experience in one uninterrupted session.
 - Prioritize speed of iteration over technical depth: skip infrastructure, keep APIs stubbed, and lean on mock data fixtures that are easy to tweak shortly before the meeting.
 - Ensure the UI behaves deterministically offline to avoid surprises during the live walkthrough.
+- Catalan and Spanish language only.
 
 ## Minimum Engineering Setup
 
@@ -24,31 +25,18 @@ The iapacte_validations repository now exists strictly to craft UI-only demos in
 
 All demo tracks must showcase these pillars:
 
-1. **Tender & Knowledge Vault** – a single repository for every tender, guideline, legal memo, and internal AI prompt doc so clerks never start from scratch.
-2. **AI Workflow Studio** – visual builders for AI + data-source pipelines that the chat UI can dynamically invoke depending on the conversation context.
-3. **Friendly Spreadsheet** – an approachable grid (think Teable, NocoDB, Stackby, Baserow) that can read/write any municipal dataset: procurement DBs, open data portals, even auto-parsed local news feeds.
-
-## Storytelling Goals
-
-Focus every commit on better sales storytelling rather than completeness:
-
-- Screen content must highlight tangible wins for clerks, department leads, and citizens—spell out “what success looks like” on the interface itself.
-- Prefer guided prompts, empty states, and inline tooltips that explain benefits, because the UI is the only artifact councils see.
-- Include applause lines (e.g., “2 weeks saved per permit cycle”) that presenters can read verbatim.
-
-## Suggested Rewrite Tracks
-
-Select one—or branch all three for testing. Each track repackages the same UI primitives around a different narrative emphasis while still covering the three core use cases:
-
-1. **“Tender Compass”** – Position the app as the definitive tender intelligence desk. Start inside the Tender & Knowledge Vault, surface AI prompts that auto-fill procurement drafts, then pivot into the Civic Spreadsheet to show how clauses reference live budget data.
-2. **“Orchestrated Intelligence Studio”** – Lead with the AI Workflow Studio: drag-and-drop nodes that blend municipal databases, open datasets, and parsed news. The chat assistant demonstrates how it chooses the right workflow mid-conversation, then logs outcomes back into the vault.
-3. **“Urban Data Grid”** – Treat the Friendly Civic Spreadsheet as the hero. Showcase read/write connections to Snowflake-like warehouses plus open-government feeds. Inline AI helpers trigger workflows and link to the tender archive as annotated references.
-
-Document in the PR description which rewrite track you contributed to so the presenter can bundle screens confidently.
+1. **Data Collector** – an approachable grid (think Teable, NocoDB, Stackby, Baserow) that can read/write any municipal dataset: procurement DBs, open data portals, even auto-parsed local news feeds.
+2. **Tender & Grants** – a single repository for every tender, guideline, legal memo, and internal AI prompt doc so clerks never start from scratch.
+3. **AI Workflow Builder** – visual builders for AI + data-source pipelines that the chat UI can dynamically invoke depending on the conversation context.
 
 ## Visual Direction
 
 - Maintain the MD3-inspired medieval aesthetic already defined in `apps/web/src/styles`, but exaggerate hierarchy so it reads clearly on a projector or screen share.
-- Use Tailwind tokens exclusively (`p-md`, `gap-sm`, `text-heading-m`, etc.) and ensure color roles remain accessible on light/dark skins.
+- **CRITICAL: Always use CSS variables instead of Tailwind spacing/color tokens.** Use `var(--spacing-md)`, `var(--primary)`, `var(--font-size-body-l)`, etc. via Tailwind's arbitrary value syntax: `px-[var(--spacing-lg)]`, `text-[var(--primary)]`, `gap-[var(--spacing-md)]`.
+- **NEVER use Tailwind spacing tokens** like `p-md`, `gap-sm`, `px-lg`, `mt-xs`, `space-y-md`, etc. These bypass the design system.
+- **NEVER use Tailwind color tokens** like `text-primary`, `bg-surface-container`, `border-outline-variant`, etc. Always use `text-[var(--primary)]`, `bg-[var(--surface-container)]`, `border-[var(--outline-variant)]`.
+- **NEVER use Tailwind font-size tokens** like `text-body-l`, `text-title-m`, etc. Always use `text-[var(--font-size-body-l)]`, `text-[var(--font-size-title-m)]`.
+- All design tokens are defined in `apps/web/src/styles/global.css` (spacing, typography, layout) and `apps/web/src/styles/themes.css` (colors). Reference these files to see available variables.
 - Any motion should be purposeful and subtle; the goal is to guide attention, not to show technical prowess.
 - Remember the Tanstack Start SSR runtime drives `apps/web`; theme tokens and CSS variables live in `apps/web/src/styles/global.css` and `apps/web/src/styles/themes.css`, so confine visual tweaks there to keep demos consistent.
+- Responsive design: the demo should be responsive and work on all screen sizes.

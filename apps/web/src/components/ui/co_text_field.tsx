@@ -56,7 +56,7 @@ export const CoTextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
 				<Input
 					{...props}
-					style={style}
+					{...(style ? { style } : {})}
 					id={id}
 					ref={ref}
 					required={required}

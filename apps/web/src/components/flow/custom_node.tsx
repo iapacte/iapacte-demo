@@ -43,6 +43,7 @@ function CustomNodeComponent({ data, selected }: NodeProps<CustomNodeData>) {
 		parameters = [],
 	} = nodeData
 
+	// Expose an accent color through CSS var so edges/handles can stay in sync
 	const accentStyle = useMemo(
 		() =>
 			accentColor
@@ -57,43 +58,47 @@ function CustomNodeComponent({ data, selected }: NodeProps<CustomNodeData>) {
 		icon ?? (title ? title.trim().slice(0, 1).toUpperCase() : '•')
 
 	const baseClasses =
-		'relative flex flex-col rounded-lg border border-outline-variant bg-surface text-on-surface shadow-elevation-md transition-shadow duration-200'
+		'relative flex flex-col rounded-[var(--radius-lg)] border border-[var(--outline-variant)] bg-[var(--surface)] text-[var(--on-surface)] transition-shadow duration-200'
 	const selectedClasses = selected
-		? ' border-primary ring-2 ring-primary/40'
+		? ' border-[var(--primary)] ring-2 ring-[var(--primary)]/40'
 		: ''
 
 	return (
 		<div className={`${baseClasses}${selectedClasses}`} style={accentStyle}>
 			<span
-				className='pointer-events-none absolute inset-y-0 start-0 w-1 rounded-l-lg'
+				className='pointer-events-none absolute inset-y-0 start-0 w-1 rounded-l-[var(--radius-lg)]'
 				style={{ backgroundColor: 'var(--node-accent-color, var(--primary))' }}
 				aria-hidden
 			/>
-			<div className='grid grid-cols-[auto_1fr] items-center gap-sm border-b border-outline-variant bg-surface-container/40 px-lg py-sm'>
-				<div className='grid h-8 w-8 place-items-center rounded-full text-title-s font-semibold text-primary'>
+			<div className='grid grid-cols-[auto_1fr] items-center gap-[var(--spacing-sm)] border-b border-[var(--outline-variant)] bg-[var(--surface-container)]/40 px-[var(--spacing-lg)] py-[var(--spacing-sm)]'>
+				<div className='grid h-8 w-8 place-items-center rounded-full text-[var(--font-size-title-s)] font-semibold text-[var(--primary)]'>
 					{iconSymbol}
 				</div>
-				<div className='flex flex-col gap-xxs'>
-					<div className='text-title-s font-semibold'>{title}</div>
+				<div className='flex flex-col gap-[var(--spacing-xxs)]'>
+					<div className='text-[var(--font-size-title-s)] font-semibold'>
+						{title}
+					</div>
 					{status ? (
-						<div className='text-label-m text-on-surface-variant'>{status}</div>
+						<div className='text-[var(--font-size-label-m)] text-[var(--on-surface-variant)]'>
+							{status}
+						</div>
 					) : null}
 				</div>
 			</div>
 			{description ? (
-				<div className='px-lg pt-sm text-body-s text-on-surface-variant'>
+				<div className='px-[var(--spacing-lg)] pt-[var(--spacing-sm)] text-[var(--font-size-body-s)] text-[var(--on-surface-variant)]'>
 					{description}
 				</div>
 			) : null}
-			<div className='flex flex-col gap-md px-lg pb-lg'>
+			<div className='flex flex-col gap-[var(--spacing-md)] px-[var(--spacing-lg)] pb-[var(--spacing-lg)]'>
 				{parameters.length > 0 ? (
-					<div className='flex flex-col gap-sm'>
+					<div className='flex flex-col gap-[var(--spacing-sm)]'>
 						{parameters.map(parameter => (
 							<div
-								className='grid grid-cols-[minmax(120px,1fr)_minmax(140px,1fr)] items-center gap-sm'
+								className='grid grid-cols-[minmax(120px,1fr)_minmax(140px,1fr)] items-center gap-[var(--spacing-sm)]'
 								key={parameter.id}
 							>
-								<div className='text-label-m font-medium text-on-surface-variant'>
+								<div className='text-[var(--font-size-label-m)] font-medium text-[var(--on-surface-variant)]'>
 									{parameter.label}
 								</div>
 								<ParameterRenderer templateData={parameter} />
@@ -102,21 +107,27 @@ function CustomNodeComponent({ data, selected }: NodeProps<CustomNodeData>) {
 					</div>
 				) : null}
 				{inputs.length > 0 || outputs.length > 0 ? (
-					<div className='grid grid-cols-2 gap-lg'>
-						<div className='flex flex-col gap-sm'>
+					<div className='grid grid-cols-2 gap-[var(--spacing-lg)]'>
+						<div className='flex flex-col gap-[var(--spacing-sm)]'>
 							<span className='sr-only'>Entrades</span>
+							{/* Inputs/targets live on the left column */}
 							{inputs.map(input => (
-								<div className='flex items-center gap-sm' key={input.id}>
+								<div
+									className='flex items-center gap-[var(--spacing-sm)]'
+									key={input.id}
+								>
 									<Handle
 										id={input.id}
 										type='target'
 										position={Position.Left}
-										accentColor={input.color}
+										accentColor={input.color ?? 'var(--primary)'}
 									/>
-									<div className='flex flex-col gap-xxs text-start'>
-										<span className='text-label-m'>{input.label}</span>
+									<div className='flex flex-col gap-[var(--spacing-xxs)] text-start'>
+										<span className='text-[var(--font-size-label-m)]'>
+											{input.label}
+										</span>
 										{input.description ? (
-											<span className='text-label-s text-on-surface-variant'>
+											<span className='text-[var(--font-size-label-s)] text-[var(--on-surface-variant)]'>
 												{input.description}
 											</span>
 										) : null}
@@ -124,14 +135,20 @@ function CustomNodeComponent({ data, selected }: NodeProps<CustomNodeData>) {
 								</div>
 							))}
 						</div>
-						<div className='flex flex-col items-end gap-sm'>
+						<div className='flex flex-col items-end gap-[var(--spacing-sm)]'>
 							<span className='sr-only'>Sortides</span>
+							{/* Outputs/sources live on the right column */}
 							{outputs.map(output => (
-								<div className='flex items-center gap-sm' key={output.id}>
-									<div className='flex flex-col items-end gap-xxs text-end'>
-										<span className='text-label-m'>{output.label}</span>
+								<div
+									className='flex items-center gap-[var(--spacing-sm)]'
+									key={output.id}
+								>
+									<div className='flex flex-col items-end gap-[var(--spacing-xxs)] text-end'>
+										<span className='text-[var(--font-size-label-m)]'>
+											{output.label}
+										</span>
 										{output.description ? (
-											<span className='text-label-s text-on-surface-variant'>
+											<span className='text-[var(--font-size-label-s)] text-[var(--on-surface-variant)]'>
 												{output.description}
 											</span>
 										) : null}
@@ -140,7 +157,7 @@ function CustomNodeComponent({ data, selected }: NodeProps<CustomNodeData>) {
 										id={output.id}
 										type='source'
 										position={Position.Right}
-										accentColor={output.color}
+										accentColor={output.color ?? 'var(--primary)'}
 									/>
 								</div>
 							))}

@@ -20,7 +20,9 @@ export function ConnectionLine({
 	return (
 		<g className='pointer-events-none' aria-hidden>
 			<path
-				className='fill-none stroke-primary stroke-2 [stroke-dasharray:8]'
+				// Preview edge so users see where a new connection will land
+				className='fill-none stroke-2 [stroke-dasharray:8]'
+				style={{ stroke: 'var(--primary)' }}
 				d={path}
 			/>
 		</g>
