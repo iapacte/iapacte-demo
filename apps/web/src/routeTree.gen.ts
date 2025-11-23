@@ -9,109 +9,145 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkflowsRouteImport } from './routes/workflows'
-import { Route as TendersRouteImport } from './routes/tenders'
-import { Route as DataRouteImport } from './routes/data'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorkflowsWorkflowIdRouteImport } from './routes/workflows/$workflowId'
+import { Route as ProductWorkflowsRouteImport } from './routes/product/workflows'
+import { Route as ProductTendersRouteImport } from './routes/product/tenders'
+import { Route as ProductTemplatesRouteImport } from './routes/product/templates'
+import { Route as ProductDataRouteImport } from './routes/product/data'
+import { Route as ProductAppsRouteImport } from './routes/product/apps'
+import { Route as ProductWorkflowsWorkflowIdRouteImport } from './routes/product/workflows/$workflowId'
+import { Route as ProductTemplatesTemplateIdRouteImport } from './routes/product/templates/$templateId'
+import { Route as ProductDataConnectorsRouteImport } from './routes/product/data/connectors'
 
-const WorkflowsRoute = WorkflowsRouteImport.update({
-  id: '/workflows',
-  path: '/workflows',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TendersRoute = TendersRouteImport.update({
-  id: '/tenders',
-  path: '/tenders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DataRoute = DataRouteImport.update({
-  id: '/data',
-  path: '/data',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkflowsWorkflowIdRoute = WorkflowsWorkflowIdRouteImport.update({
-  id: '/$workflowId',
-  path: '/$workflowId',
-  getParentRoute: () => WorkflowsRoute,
+const ProductWorkflowsRoute = ProductWorkflowsRouteImport.update({
+  id: '/product/workflows',
+  path: '/product/workflows',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductTendersRoute = ProductTendersRouteImport.update({
+  id: '/product/tenders',
+  path: '/product/tenders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductTemplatesRoute = ProductTemplatesRouteImport.update({
+  id: '/product/templates',
+  path: '/product/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductDataRoute = ProductDataRouteImport.update({
+  id: '/product/data',
+  path: '/product/data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductAppsRoute = ProductAppsRouteImport.update({
+  id: '/product/apps',
+  path: '/product/apps',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductWorkflowsWorkflowIdRoute =
+  ProductWorkflowsWorkflowIdRouteImport.update({
+    id: '/$workflowId',
+    path: '/$workflowId',
+    getParentRoute: () => ProductWorkflowsRoute,
+  } as any)
+const ProductTemplatesTemplateIdRoute =
+  ProductTemplatesTemplateIdRouteImport.update({
+    id: '/$templateId',
+    path: '/$templateId',
+    getParentRoute: () => ProductTemplatesRoute,
+  } as any)
+const ProductDataConnectorsRoute = ProductDataConnectorsRouteImport.update({
+  id: '/connectors',
+  path: '/connectors',
+  getParentRoute: () => ProductDataRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/data': typeof DataRoute
-  '/tenders': typeof TendersRoute
-  '/workflows': typeof WorkflowsRouteWithChildren
-  '/workflows/$workflowId': typeof WorkflowsWorkflowIdRoute
+  '/product/apps': typeof ProductAppsRoute
+  '/product/data': typeof ProductDataRouteWithChildren
+  '/product/templates': typeof ProductTemplatesRouteWithChildren
+  '/product/tenders': typeof ProductTendersRoute
+  '/product/workflows': typeof ProductWorkflowsRouteWithChildren
+  '/product/data/connectors': typeof ProductDataConnectorsRoute
+  '/product/templates/$templateId': typeof ProductTemplatesTemplateIdRoute
+  '/product/workflows/$workflowId': typeof ProductWorkflowsWorkflowIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/data': typeof DataRoute
-  '/tenders': typeof TendersRoute
-  '/workflows': typeof WorkflowsRouteWithChildren
-  '/workflows/$workflowId': typeof WorkflowsWorkflowIdRoute
+  '/product/apps': typeof ProductAppsRoute
+  '/product/data': typeof ProductDataRouteWithChildren
+  '/product/templates': typeof ProductTemplatesRouteWithChildren
+  '/product/tenders': typeof ProductTendersRoute
+  '/product/workflows': typeof ProductWorkflowsRouteWithChildren
+  '/product/data/connectors': typeof ProductDataConnectorsRoute
+  '/product/templates/$templateId': typeof ProductTemplatesTemplateIdRoute
+  '/product/workflows/$workflowId': typeof ProductWorkflowsWorkflowIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/data': typeof DataRoute
-  '/tenders': typeof TendersRoute
-  '/workflows': typeof WorkflowsRouteWithChildren
-  '/workflows/$workflowId': typeof WorkflowsWorkflowIdRoute
+  '/product/apps': typeof ProductAppsRoute
+  '/product/data': typeof ProductDataRouteWithChildren
+  '/product/templates': typeof ProductTemplatesRouteWithChildren
+  '/product/tenders': typeof ProductTendersRoute
+  '/product/workflows': typeof ProductWorkflowsRouteWithChildren
+  '/product/data/connectors': typeof ProductDataConnectorsRoute
+  '/product/templates/$templateId': typeof ProductTemplatesTemplateIdRoute
+  '/product/workflows/$workflowId': typeof ProductWorkflowsWorkflowIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/data'
-    | '/tenders'
-    | '/workflows'
-    | '/workflows/$workflowId'
+    | '/product/apps'
+    | '/product/data'
+    | '/product/templates'
+    | '/product/tenders'
+    | '/product/workflows'
+    | '/product/data/connectors'
+    | '/product/templates/$templateId'
+    | '/product/workflows/$workflowId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/data' | '/tenders' | '/workflows' | '/workflows/$workflowId'
+  to:
+    | '/'
+    | '/product/apps'
+    | '/product/data'
+    | '/product/templates'
+    | '/product/tenders'
+    | '/product/workflows'
+    | '/product/data/connectors'
+    | '/product/templates/$templateId'
+    | '/product/workflows/$workflowId'
   id:
     | '__root__'
     | '/'
-    | '/data'
-    | '/tenders'
-    | '/workflows'
-    | '/workflows/$workflowId'
+    | '/product/apps'
+    | '/product/data'
+    | '/product/templates'
+    | '/product/tenders'
+    | '/product/workflows'
+    | '/product/data/connectors'
+    | '/product/templates/$templateId'
+    | '/product/workflows/$workflowId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DataRoute: typeof DataRoute
-  TendersRoute: typeof TendersRoute
-  WorkflowsRoute: typeof WorkflowsRouteWithChildren
+  ProductAppsRoute: typeof ProductAppsRoute
+  ProductDataRoute: typeof ProductDataRouteWithChildren
+  ProductTemplatesRoute: typeof ProductTemplatesRouteWithChildren
+  ProductTendersRoute: typeof ProductTendersRoute
+  ProductWorkflowsRoute: typeof ProductWorkflowsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workflows': {
-      id: '/workflows'
-      path: '/workflows'
-      fullPath: '/workflows'
-      preLoaderRoute: typeof WorkflowsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tenders': {
-      id: '/tenders'
-      path: '/tenders'
-      fullPath: '/tenders'
-      preLoaderRoute: typeof TendersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/data': {
-      id: '/data'
-      path: '/data'
-      fullPath: '/data'
-      preLoaderRoute: typeof DataRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -119,33 +155,106 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/workflows/$workflowId': {
-      id: '/workflows/$workflowId'
+    '/product/workflows': {
+      id: '/product/workflows'
+      path: '/product/workflows'
+      fullPath: '/product/workflows'
+      preLoaderRoute: typeof ProductWorkflowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/tenders': {
+      id: '/product/tenders'
+      path: '/product/tenders'
+      fullPath: '/product/tenders'
+      preLoaderRoute: typeof ProductTendersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/templates': {
+      id: '/product/templates'
+      path: '/product/templates'
+      fullPath: '/product/templates'
+      preLoaderRoute: typeof ProductTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/data': {
+      id: '/product/data'
+      path: '/product/data'
+      fullPath: '/product/data'
+      preLoaderRoute: typeof ProductDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/apps': {
+      id: '/product/apps'
+      path: '/product/apps'
+      fullPath: '/product/apps'
+      preLoaderRoute: typeof ProductAppsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/workflows/$workflowId': {
+      id: '/product/workflows/$workflowId'
       path: '/$workflowId'
-      fullPath: '/workflows/$workflowId'
-      preLoaderRoute: typeof WorkflowsWorkflowIdRouteImport
-      parentRoute: typeof WorkflowsRoute
+      fullPath: '/product/workflows/$workflowId'
+      preLoaderRoute: typeof ProductWorkflowsWorkflowIdRouteImport
+      parentRoute: typeof ProductWorkflowsRoute
+    }
+    '/product/templates/$templateId': {
+      id: '/product/templates/$templateId'
+      path: '/$templateId'
+      fullPath: '/product/templates/$templateId'
+      preLoaderRoute: typeof ProductTemplatesTemplateIdRouteImport
+      parentRoute: typeof ProductTemplatesRoute
+    }
+    '/product/data/connectors': {
+      id: '/product/data/connectors'
+      path: '/connectors'
+      fullPath: '/product/data/connectors'
+      preLoaderRoute: typeof ProductDataConnectorsRouteImport
+      parentRoute: typeof ProductDataRoute
     }
   }
 }
 
-interface WorkflowsRouteChildren {
-  WorkflowsWorkflowIdRoute: typeof WorkflowsWorkflowIdRoute
+interface ProductDataRouteChildren {
+  ProductDataConnectorsRoute: typeof ProductDataConnectorsRoute
 }
 
-const WorkflowsRouteChildren: WorkflowsRouteChildren = {
-  WorkflowsWorkflowIdRoute: WorkflowsWorkflowIdRoute,
+const ProductDataRouteChildren: ProductDataRouteChildren = {
+  ProductDataConnectorsRoute: ProductDataConnectorsRoute,
 }
 
-const WorkflowsRouteWithChildren = WorkflowsRoute._addFileChildren(
-  WorkflowsRouteChildren,
+const ProductDataRouteWithChildren = ProductDataRoute._addFileChildren(
+  ProductDataRouteChildren,
 )
+
+interface ProductTemplatesRouteChildren {
+  ProductTemplatesTemplateIdRoute: typeof ProductTemplatesTemplateIdRoute
+}
+
+const ProductTemplatesRouteChildren: ProductTemplatesRouteChildren = {
+  ProductTemplatesTemplateIdRoute: ProductTemplatesTemplateIdRoute,
+}
+
+const ProductTemplatesRouteWithChildren =
+  ProductTemplatesRoute._addFileChildren(ProductTemplatesRouteChildren)
+
+interface ProductWorkflowsRouteChildren {
+  ProductWorkflowsWorkflowIdRoute: typeof ProductWorkflowsWorkflowIdRoute
+}
+
+const ProductWorkflowsRouteChildren: ProductWorkflowsRouteChildren = {
+  ProductWorkflowsWorkflowIdRoute: ProductWorkflowsWorkflowIdRoute,
+}
+
+const ProductWorkflowsRouteWithChildren =
+  ProductWorkflowsRoute._addFileChildren(ProductWorkflowsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DataRoute: DataRoute,
-  TendersRoute: TendersRoute,
-  WorkflowsRoute: WorkflowsRouteWithChildren,
+  ProductAppsRoute: ProductAppsRoute,
+  ProductDataRoute: ProductDataRouteWithChildren,
+  ProductTemplatesRoute: ProductTemplatesRouteWithChildren,
+  ProductTendersRoute: ProductTendersRoute,
+  ProductWorkflowsRoute: ProductWorkflowsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

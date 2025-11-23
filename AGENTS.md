@@ -4,17 +4,21 @@
 
 The iapacte_validations repository now exists strictly to craft UI-only demos inside `apps/web` for a single in-person sales and feedback session with city councils. Nothing ships to production, no backend calls are required, and every flow can run entirely offline on the presenter's laptop. All work should answer one question: *does this convince councils to adopt Iapacte?*
 
+## Repository Guide
+
+- Repository layout, tooling setup, and deployment notes live in `README.md` files ([apps/web SSR web](apps/web/README.md), [Docker/Unikraft](README.md)). Follow that file for environment steps; this document only adds demo-specific rules so we avoid repeating the README.
+
 ## Demo Constraints
 
 - Build screens and interactions only in `apps/web`; disable or mock anything that implies real data processing.
 - Bundle every use case into one cohesive storyline so presenters can walk through the entire experience in one uninterrupted session.
 - Prioritize speed of iteration over technical depth: skip infrastructure, keep APIs stubbed, and lean on mock data fixtures that are easy to tweak shortly before the meeting.
 - Ensure the UI behaves deterministically offline to avoid surprises during the live walkthrough.
-- Catalan and Spanish language only.
+- UI presented to users in Catalan language only. Spanish is not supported yet. Code, comments, and documentation should be in English.
 
 ## Minimum Engineering Setup
 
-- Use the existing toolchain (Nix dev shell + pnpm v9 + React 19 + Tanstack Router + Effect Atom) but strip out unused dependencies where possible to keep installs fast.
+- Use the toolchain defined in `README.md` (Nix dev shell + pnpm v9 + React 19 + Tanstack Router + Effect Atom) and strip unused dependencies where possible to keep installs fast.
 - The only command that must work flawlessly is `pnpm --filter @aipacto/apps-web dev`.
 - Keep lint (`pnpm lint`) and type checks (`pnpm check-types`) green so that rapid UI tweaks remain safe, even if the backend is mocked.
 
@@ -37,3 +41,4 @@ All demo tracks must showcase these pillars:
 - Any motion should be purposeful and subtle; the goal is to guide attention, not to show technical prowess.
 - Remember the Tanstack Start SSR runtime drives `apps/web`; theme tokens and CSS variables live in `apps/web/src/styles/global.css` and `apps/web/src/styles/themes.css`, so confine visual tweaks there to keep demos consistent.
 - Responsive design: the demo should be responsive and work on all screen sizes.
+- Responsive rule: when lists, grids, or tables risk overflow, wrap them in `overflow-x-auto` containers and set children to `min-w-0` where needed so layouts shrink gracefully on small screens.

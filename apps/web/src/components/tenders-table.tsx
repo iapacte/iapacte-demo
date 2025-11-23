@@ -1,4 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
 import {
 	type ColumnDef,
 	flexRender,
@@ -157,7 +156,7 @@ const FOLDERS: FolderItem[] = [
 	},
 ] as const
 
-function TenderVaultDirectory() {
+export function TenderVaultDirectory() {
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 	const [searchText, setSearchText] = useState('')
 	const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
@@ -200,62 +199,47 @@ function TenderVaultDirectory() {
 				const searchLower = searchText.toLowerCase()
 				const matchesSearch =
 					item.name.toLowerCase().includes(searchLower) ||
-					item.description.toLowerCase().includes(searchLower) ||
-					item.tags.some(tag => tag.toLowerCase().includes(searchLower))
+					item.description.toLowerCase().includes(searchLower)
 				if (!matchesSearch) return false
 			}
 
-			// Tag filter
+			// Tags filter
 			if (selectedTags.size > 0) {
-				const hasSelectedTag = item.tags.some(tag => selectedTags.has(tag))
-				if (!hasSelectedTag) return false
+				const matchesTag = item.tags.some(tag => selectedTags.has(tag))
+				if (!matchesTag) return false
 			}
 
 			return true
 		})
 	}, [allItems, searchText, selectedTags])
 
-	// Get visible folders (only show folders that match or have matching children)
-	const visibleFolders = useMemo(() => {
-		return FOLDERS.filter(folder => {
-			// Check if folder itself matches
-			const folderMatches = filteredItems.some(item => item.id === folder.id)
-			// Check if any child matches
-			const childMatches =
-				folder.children?.some(child =>
-					filteredItems.some(item => item.id === child.id),
-				) ?? false
-			return folderMatches || childMatches
-		})
-	}, [filteredItems])
-
-	// Build table data with parent-child relationships
-	const tableData = useMemo<TableRow[]>(() => {
+	// Map to table rows with parent-child relationships
+	const tableData = useMemo(() => {
 		const rows: TableRow[] = []
-		visibleFolders.forEach(folder => {
-			// Add folder row
-			rows.push({
-				...folder,
-				isChild: false,
-			})
-			// Add children if folder is expanded and has matching children
-			if (expanded[folder.id] && folder.children) {
-				const visibleChildren = folder.children.filter(child =>
-					filteredItems.some(item => item.id === child.id),
-				)
-				visibleChildren.forEach(child => {
-					rows.push({
-						...child,
-						isChild: true,
-						parentId: folder.id,
-					})
+
+		FOLDERS.forEach(folder => {
+			const includeFolder = filteredItems.some(item => item.id === folder.id)
+			const includeChild = folder.children?.some(child =>
+				filteredItems.some(item => item.id === child.id),
+			)
+
+			if (!includeFolder && !includeChild) return
+
+			rows.push(folder)
+
+			if (folder.children) {
+				folder.children.forEach(child => {
+					const childIncluded = filteredItems.some(item => item.id === child.id)
+					if (childIncluded) {
+						rows.push({ ...child, isChild: true, parentId: folder.id })
+					}
 				})
 			}
 		})
-		return rows
-	}, [visibleFolders, expanded, filteredItems])
 
-	// Define columns
+		return rows
+	}, [filteredItems])
+
 	const columns = useMemo<ColumnDef<TableRow>[]>(
 		() => [
 			{
@@ -268,127 +252,37 @@ function TenderVaultDirectory() {
 				),
 				cell: ({ row, getValue }) => {
 					const isChild = row.original.isChild ?? false
-					const hasChildren =
-						!isChild &&
-						row.original.children &&
-						row.original.children.length > 0
-					const isExpanded = expanded[row.original.id] ?? false
-					const isFolder = !isChild
+					const parentId = row.original.parentId
+					const isExpanded = expanded[parentId ?? ''] ?? false
 
 					return (
-						<div
-							className={`flex items-center gap-[var(--spacing-sm)] ${
-								isChild ? 'pl-[var(--spacing-xl)]' : ''
-							}`}
-						>
-							{hasChildren && (
+						<div className='flex items-center gap-[var(--spacing-xs)] text-[var(--font-size-body-m)] text-[var(--on-surface)]'>
+							{isChild ? (
+								<span className='pl-[var(--spacing-sm)] text-[var(--on-surface-variant)]'>
+									↳
+								</span>
+							) : (
 								<button
 									type='button'
-									onClick={() => {
+									aria-label={isExpanded ? 'Amagar carpeta' : 'Mostrar carpeta'}
+									onClick={() =>
 										setExpanded(prev => ({
 											...prev,
-											[row.original.id]: !prev[row.original.id],
+											[parentId ?? row.id]: !isExpanded,
 										}))
-									}}
-									className='inline-flex items-center justify-center w-4 h-4'
+									}
+									className='rounded border border-transparent p-[var(--spacing-xxs)] text-[var(--primary)] transition hover:border-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]'
 								>
 									{isExpanded ? (
-										<ChevronDown
-											className='h-4 w-4 text-[var(--on-surface-variant)]'
-											aria-hidden
-										/>
+										<ChevronDown className='h-4 w-4' aria-hidden />
 									) : (
-										<ChevronRight
-											className='h-4 w-4 text-[var(--on-surface-variant)]'
-											aria-hidden
-										/>
+										<ChevronRight className='h-4 w-4' aria-hidden />
 									)}
 								</button>
 							)}
-							{isFolder && (
-								<FolderClosed
-									className='h-4 w-4 text-[var(--on-surface-variant)]'
-									aria-hidden
-								/>
-							)}
-							<span
-								className={`${
-									isChild
-										? 'text-[var(--font-size-body-s)]'
-										: 'text-[var(--font-size-body-m)]'
-								} font-medium`}
-							>
-								{getValue() as string}
-							</span>
+							<span>{getValue() as string}</span>
 						</div>
 					)
-				},
-			},
-			{
-				id: 'type',
-				accessorFn: row => {
-					const isChild = row.isChild ?? false
-					if (isChild) {
-						return row.fileType ?? 'OTHER'
-					}
-					return 'FOLDER'
-				},
-				header: ({ column }) => {
-					const sorted = column.getIsSorted()
-					return (
-						<button
-							type='button'
-							onClick={() => column.toggleSorting()}
-							className='flex items-center gap-[var(--spacing-xs)] hover:text-[var(--primary)] transition'
-						>
-							<Tag className='h-4 w-4' aria-hidden />
-							<span>Tipus</span>
-							{!sorted && (
-								<ArrowUpDown className='h-3 w-3 text-[var(--on-surface-variant)]' />
-							)}
-							{sorted === 'asc' && (
-								<ArrowUp className='h-3 w-3 text-[var(--primary)]' />
-							)}
-							{sorted === 'desc' && (
-								<ArrowDown className='h-3 w-3 text-[var(--primary)]' />
-							)}
-						</button>
-					)
-				},
-				cell: ({ row }) => {
-					const isChild = row.original.isChild ?? false
-					if (isChild && row.original.fileType) {
-						return (
-							<span className='inline-flex items-center rounded-full border border-[var(--outline-variant)] bg-[var(--surface-container)] px-[var(--spacing-xs)] py-[var(--spacing-xxs)] text-[var(--font-size-label-s)] font-medium text-[var(--on-surface)]'>
-								{row.original.fileType}
-							</span>
-						)
-					}
-					if (!isChild) {
-						return (
-							<span className='inline-flex items-center gap-[var(--spacing-xxs)]'>
-								<FolderClosed
-									className='h-4 w-4 text-[var(--on-surface-variant)]'
-									aria-hidden
-								/>
-								<span className='text-[var(--font-size-label-s)] text-[var(--on-surface-variant)]'>
-									Carpeta
-								</span>
-							</span>
-						)
-					}
-					return null
-				},
-				sortingFn: (rowA, rowB) => {
-					const aIsChild = rowA.original.isChild ?? false
-					const bIsChild = rowB.original.isChild ?? false
-					const aType = aIsChild
-						? (rowA.original.fileType ?? 'OTHER')
-						: 'FOLDER'
-					const bType = bIsChild
-						? (rowB.original.fileType ?? 'OTHER')
-						: 'FOLDER'
-					return aType.localeCompare(bType)
 				},
 			},
 			{
@@ -399,20 +293,11 @@ function TenderVaultDirectory() {
 						Descripció
 					</div>
 				),
-				cell: ({ row, getValue }) => {
-					const isChild = row.original.isChild ?? false
-					return (
-						<span
-							className={`text-[var(--font-size-body-s)] ${
-								isChild
-									? 'text-[var(--on-surface-variant)]'
-									: 'text-[var(--on-surface-variant)]'
-							}`}
-						>
-							{getValue() as string}
-						</span>
-					)
-				},
+				cell: ({ getValue }) => (
+					<p className='text-[var(--font-size-body-s)] text-[var(--on-surface-variant)]'>
+						{getValue() as string}
+					</p>
+				),
 			},
 			{
 				accessorKey: 'updated',
@@ -556,6 +441,12 @@ function TenderVaultDirectory() {
 							</div>
 						</div>
 					</div>
+
+					<div className='rounded-[var(--radius-xl)] border border-dashed border-[var(--outline-variant)] bg-[var(--surface-container-low)] p-[var(--spacing-lg)] text-center text-[var(--font-size-body-m)] text-[var(--on-surface-variant)]'>
+						Prepara una nova carpeta demo abans de la reunió i arrossega les
+						darreres plantilles: la graella Data Collector reconeix
+						automàticament els enllaços i els mostra com a cites contextuals.
+					</div>
 				</aside>
 
 				<div className='space-y-[var(--spacing-md)] min-w-0'>
@@ -621,19 +512,3 @@ function TenderVaultDirectory() {
 		</section>
 	)
 }
-
-export const Route = createFileRoute('/tenders')({
-	component: TenderVaultDirectory,
-	head: () => ({
-		meta: [
-			{
-				title: 'Directori Tenders & Grants',
-			},
-			{
-				name: 'description',
-				content:
-					'Carpetes tipus Google Drive per revisar licitacions, subvencions i plantilles de xat d’IA sense connexió.',
-			},
-		],
-	}),
-})

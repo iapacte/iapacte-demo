@@ -23,19 +23,19 @@ export function NotFound(_: NotFoundRouteProps) {
 					Back to Demo Hub
 				</Link>
 				<Link
-					to='/tenders'
+					to='/product/tenders'
 					className='inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--primary)] px-[var(--spacing-md)] py-[var(--spacing-xs)] font-medium text-[var(--primary)] hover:bg-[var(--surface-container)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]'
 				>
 					Tender Vault
 				</Link>
 				<Link
-					to='/workflows'
+					to='/product/workflows'
 					className='inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--primary)] px-[var(--spacing-md)] py-[var(--spacing-xs)] font-medium text-[var(--primary)] hover:bg-[var(--surface-container)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]'
 				>
 					Workflow Studio
 				</Link>
 				<Link
-					to='/data'
+					to='/product/data'
 					className='inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--primary)] px-[var(--spacing-md)] py-[var(--spacing-xs)] font-medium text-[var(--primary)] hover:bg-[var(--surface-container)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]'
 				>
 					Civic Spreadsheet

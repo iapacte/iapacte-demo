@@ -1,4 +1,4 @@
-import { CoLanguageSelector, CoThemeSelector } from './index'
+import { CoThemeSelector } from './index'
 
 export function CoFooter() {
 	return (
@@ -16,7 +16,7 @@ export function CoFooter() {
 				Iapacte Demo Hub
 			</div>
 			<div className='flex items-center gap-[var(--spacing-sm)]'>
-				<CoLanguageSelector />
+				{/* <CoLanguageSelector /> */}
 				<CoThemeSelector />
 			</div>
 		</footer>

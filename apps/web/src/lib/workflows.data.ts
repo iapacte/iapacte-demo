@@ -20,22 +20,31 @@ const tenderScrutinizerNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 80, y: 140 },
 		data: {
-			title: 'Tender Vault Loader',
+			title: "Carregador de l'arxiu de licitacions",
 			icon: '📂',
-			status: 'Synced hourly',
-			description: 'Indexes procurement PDFs, annexes, and guidelines.',
+			status: 'Sincronitzat cada hora',
+			description: 'Indexa PDFs de contractació, annexos i directrius.',
 			accentColor: civicSecondary,
 			outputs: [
-				{ id: 'vault-output', label: 'Tender files', color: civicSecondary },
+				{
+					id: 'vault-output',
+					label: 'Arxius de licitació',
+					color: civicSecondary,
+				},
 			],
 			parameters: [
 				{
 					id: 'loader-source',
-					label: 'Source',
+					label: 'Font',
 					type: 'str',
 					value: 'S3://iapacte-tenders',
 				},
-				{ id: 'loader-volume', label: 'Docs synced', type: 'int', value: 4821 },
+				{
+					id: 'loader-volume',
+					label: 'Documents sincronitzats',
+					type: 'int',
+					value: 4821,
+				},
 			],
 		},
 	},
@@ -44,15 +53,19 @@ const tenderScrutinizerNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 360, y: 120 },
 		data: {
-			title: 'Compliance NLP',
+			title: 'NLP de compliment',
 			icon: '🧠',
-			status: 'Evaluating clauses',
-			description: 'Extracts obligations, deadlines, and scoring dimensions.',
+			status: 'Avaluant clàusules',
+			description: 'Extreu obligacions, terminis i dimensions de puntuació.',
 			accentColor: civicPrimary,
 			inputs: [
-				{ id: 'nlp-input', label: 'Tender files', color: civicSecondary },
+				{
+					id: 'nlp-input',
+					label: 'Arxius de licitació',
+					color: civicSecondary,
+				},
 			],
-			outputs: [{ id: 'nlp-output', label: 'Findings', color: civicPrimary }],
+			outputs: [{ id: 'nlp-output', label: 'Resultats', color: civicPrimary }],
 			parameters: [
 				{
 					id: 'nlp-model',
@@ -62,9 +75,9 @@ const tenderScrutinizerNodes: FlowNode[] = [
 				},
 				{
 					id: 'nlp-risk',
-					label: 'Risk thresholds',
+					label: 'Llindars de risc',
 					type: 'str',
-					value: 'High/Med/Low',
+					value: 'Alt/Mig/Baix',
 				},
 			],
 		},
@@ -74,34 +87,35 @@ const tenderScrutinizerNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 640, y: 100 },
 		data: {
-			title: 'Risk Scoring',
+			title: 'Puntuació de risc',
 			icon: '⚖️',
-			status: '76% compliant',
-			description: 'Maps findings to municipal rulebook and budgets.',
+			status: '76% conforme',
+			description:
+				'Relaciona els resultats amb el reglament municipal i els pressupostos.',
 			accentColor: civicTertiary,
 			inputs: [
-				{ id: 'risk-input-findings', label: 'Findings', color: civicPrimary },
+				{ id: 'risk-input-findings', label: 'Resultats', color: civicPrimary },
 				{
 					id: 'risk-input-ledger',
-					label: 'Ledger records',
+					label: 'Registres del llibre major',
 					color: civicSecondary,
 				},
 			],
 			outputs: [
 				{
 					id: 'risk-output',
-					label: 'Compliance insights',
+					label: 'Informes de compliment',
 					color: civicTertiary,
 				},
 			],
 			parameters: [
 				{
 					id: 'risk-budget',
-					label: 'Budget link',
+					label: 'Enllaç pressupostari',
 					type: 'str',
 					value: 'ERP:CAPEX-2025',
 				},
-				{ id: 'risk-alert', label: 'Alert threshold', type: 'int', value: 70 },
+				{ id: 'risk-alert', label: "Llindar d'alerta", type: 'int', value: 70 },
 			],
 		},
 	},
@@ -110,23 +124,31 @@ const tenderScrutinizerNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 920, y: 140 },
 		data: {
-			title: 'Legal Brief Generator',
+			title: "Generador d'informes legals",
 			icon: '📜',
-			status: 'Draft ready',
-			description: 'Produces summary + next steps for the legal desk.',
+			status: 'Esborrany llest',
+			description: 'Genera resum i passos següents per a la taula jurídica.',
 			accentColor: civicSecondary,
 			inputs: [
-				{ id: 'brief-input-risk', label: 'Risk summary', color: civicTertiary },
+				{
+					id: 'brief-input-risk',
+					label: 'Resum de risc',
+					color: civicTertiary,
+				},
 			],
 			outputs: [
-				{ id: 'brief-output', label: 'Brief PDF', color: civicSecondary },
+				{
+					id: 'brief-output',
+					label: "PDF de l'informe",
+					color: civicSecondary,
+				},
 			],
 			parameters: [
 				{
 					id: 'brief-language',
-					label: 'Language',
+					label: 'Idioma',
 					type: 'str',
-					value: 'Catalan',
+					value: 'Català',
 				},
 			],
 		},
@@ -169,17 +191,21 @@ const citizenSwitchboardNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 100, y: 200 },
 		data: {
-			title: 'Intent Gateway',
+			title: "Porta d'intencions",
 			icon: '🛎️',
-			status: 'Listening',
-			description: 'Classifies chats into service, permit, or alert.',
+			status: 'Escoltant',
+			description: 'Classifica xats en servei, permís o alerta.',
 			outputs: [
-				{ id: 'intent-output', label: 'Intent label', color: civicPrimary },
+				{
+					id: 'intent-output',
+					label: "Etiqueta d'intenció",
+					color: civicPrimary,
+				},
 			],
 			parameters: [
 				{
 					id: 'intent-latency',
-					label: 'Latency',
+					label: 'Latència',
 					type: 'str',
 					value: '<250ms',
 				},
@@ -191,16 +217,21 @@ const citizenSwitchboardNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 360, y: 80 },
 		data: {
-			title: 'Service Request Flow',
+			title: 'Flux de sol·licituds de servei',
 			icon: '🧹',
-			status: 'Queued',
-			description: 'Creates tickets in maintenance DB and fetches ETA.',
+			status: 'A la cua',
+			description:
+				"Crea tiquets a la base de dades de manteniment i obté l'ETA.",
 			accentColor: civicSecondary,
 			inputs: [
-				{ id: 'service-intent', label: 'Intent label', color: civicPrimary },
+				{
+					id: 'service-intent',
+					label: "Etiqueta d'intenció",
+					color: civicPrimary,
+				},
 			],
 			outputs: [
-				{ id: 'service-output', label: 'Ticket ID', color: civicSecondary },
+				{ id: 'service-output', label: 'ID de tiquet', color: civicSecondary },
 			],
 		},
 	},
@@ -209,16 +240,21 @@ const citizenSwitchboardNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 360, y: 220 },
 		data: {
-			title: 'Permit Guidance',
+			title: 'Guia de permisos',
 			icon: '📑',
-			status: 'Auto-answering',
-			description: 'Looks up policy docs and preps personalized checklist.',
+			status: 'Resposta automàtica',
+			description:
+				'Consulta documents de polítiques i prepara una llista personalitzada.',
 			accentColor: civicPrimary,
 			inputs: [
-				{ id: 'permit-intent', label: 'Intent label', color: civicPrimary },
+				{
+					id: 'permit-intent',
+					label: "Etiqueta d'intenció",
+					color: civicPrimary,
+				},
 			],
 			outputs: [
-				{ id: 'permit-output', label: 'Guidance', color: civicPrimary },
+				{ id: 'permit-output', label: 'Orientació', color: civicPrimary },
 			],
 		},
 	},
@@ -227,16 +263,25 @@ const citizenSwitchboardNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 360, y: 360 },
 		data: {
-			title: 'Alert Bridge',
+			title: "Pont d'alertes",
 			icon: '🚨',
-			status: 'Idle',
-			description: 'Routes urgent safety alerts to duty officers.',
+			status: 'Inactiu',
+			description:
+				'Envia alertes urgents de seguretat als oficials de guàrdia.',
 			accentColor: civicTertiary,
 			inputs: [
-				{ id: 'alert-intent', label: 'Intent label', color: civicPrimary },
+				{
+					id: 'alert-intent',
+					label: "Etiqueta d'intenció",
+					color: civicPrimary,
+				},
 			],
 			outputs: [
-				{ id: 'alert-output', label: 'Dispatch payload', color: civicTertiary },
+				{
+					id: 'alert-output',
+					label: 'Dades de desplegament',
+					color: civicTertiary,
+				},
 			],
 		},
 	},
@@ -245,24 +290,29 @@ const citizenSwitchboardNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 660, y: 220 },
 		data: {
-			title: 'Chat Responder',
+			title: 'Responent de xat',
 			icon: '💬',
-			status: 'Streaming reply',
-			description: 'Composes final response referencing workflow outcome.',
+			status: 'Resposta en flux',
+			description:
+				'Composa la resposta final fent referència al resultat del flux.',
 			accentColor: civicSecondary,
 			inputs: [
-				{ id: 'responder-service', label: 'Ticket ID', color: civicSecondary },
-				{ id: 'responder-permit', label: 'Guidance', color: civicPrimary },
+				{
+					id: 'responder-service',
+					label: 'ID de tiquet',
+					color: civicSecondary,
+				},
+				{ id: 'responder-permit', label: 'Orientació', color: civicPrimary },
 				{
 					id: 'responder-alert',
-					label: 'Dispatch payload',
+					label: 'Dades de desplegament',
 					color: civicTertiary,
 				},
 			],
 			outputs: [
 				{
 					id: 'responder-output',
-					label: 'Chat message',
+					label: 'Missatge de xat',
 					color: civicSecondary,
 				},
 			],
@@ -333,12 +383,12 @@ const budgetPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 80, y: 160 },
 		data: {
-			title: 'Budget Scheduler',
+			title: 'Programador de pressupost',
 			icon: '⏱️',
-			status: 'Nightly',
-			description: 'Triggers ERP, open data, and news pipelines.',
+			status: 'Cada nit',
+			description: 'Activa canals ERP, dades obertes i notícies.',
 			outputs: [
-				{ id: 'scheduler-output', label: 'Cron tick', color: civicSecondary },
+				{ id: 'scheduler-output', label: 'Tic de cron', color: civicSecondary },
 			],
 		},
 	},
@@ -347,12 +397,16 @@ const budgetPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 340, y: 80 },
 		data: {
-			title: 'ERP Connector',
+			title: 'Connector ERP',
 			icon: '💼',
-			status: 'Synced',
+			status: 'Sincronitzat',
 			accentColor: civicPrimary,
-			inputs: [{ id: 'erp-input', label: 'Cron tick', color: civicSecondary }],
-			outputs: [{ id: 'erp-output', label: 'Spend feed', color: civicPrimary }],
+			inputs: [
+				{ id: 'erp-input', label: 'Tic de cron', color: civicSecondary },
+			],
+			outputs: [
+				{ id: 'erp-output', label: 'Flux de despesa', color: civicPrimary },
+			],
 		},
 	},
 	{
@@ -360,13 +414,15 @@ const budgetPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 340, y: 240 },
 		data: {
-			title: 'News Sentiment',
+			title: 'Sentiment de notícies',
 			icon: '📰',
-			status: 'Parsing 12 papers',
+			status: 'Analitzant 12 mitjans',
 			accentColor: civicTertiary,
-			inputs: [{ id: 'news-input', label: 'Cron tick', color: civicSecondary }],
+			inputs: [
+				{ id: 'news-input', label: 'Tic de cron', color: civicSecondary },
+			],
 			outputs: [
-				{ id: 'news-output', label: 'Sentiment feed', color: civicTertiary },
+				{ id: 'news-output', label: 'Flux de sentiment', color: civicTertiary },
 			],
 		},
 	},
@@ -375,15 +431,21 @@ const budgetPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 620, y: 150 },
 		data: {
-			title: 'Anomaly Detector',
+			title: "Detector d'anomalies",
 			icon: '📈',
-			status: 'Flagged 2 items',
-			description: 'Compares spend against news & KPIs.',
+			status: '2 elements marcats',
+			description: 'Compara la despesa amb notícies i KPI.',
 			inputs: [
-				{ id: 'anomaly-spend', label: 'Spend feed', color: civicPrimary },
-				{ id: 'anomaly-news', label: 'Sentiment feed', color: civicTertiary },
+				{ id: 'anomaly-spend', label: 'Flux de despesa', color: civicPrimary },
+				{
+					id: 'anomaly-news',
+					label: 'Flux de sentiment',
+					color: civicTertiary,
+				},
 			],
-			outputs: [{ id: 'anomaly-output', label: 'Alerts', color: civicPrimary }],
+			outputs: [
+				{ id: 'anomaly-output', label: 'Alertes', color: civicPrimary },
+			],
 		},
 	},
 	{
@@ -391,11 +453,11 @@ const budgetPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 900, y: 150 },
 		data: {
-			title: 'Finance Brief',
+			title: 'Informe financer',
 			icon: '📊',
-			status: 'Ready for CFO',
-			inputs: [{ id: 'brief-input', label: 'Alerts', color: civicPrimary }],
-			outputs: [{ id: 'brief-output', label: 'Digest', color: civicSecondary }],
+			status: 'Llest per al CFO',
+			inputs: [{ id: 'brief-input', label: 'Alertes', color: civicPrimary }],
+			outputs: [{ id: 'brief-output', label: 'Resum', color: civicSecondary }],
 		},
 	},
 ]
@@ -454,14 +516,14 @@ const emergencyBriefNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 120, y: 160 },
 		data: {
-			title: 'Incident Webhook',
+			title: "Webhook d'incidents",
 			icon: '📡',
-			status: 'Live',
-			description: 'Receives events from 112 and local police.',
+			status: 'En directe',
+			description: 'Rep esdeveniments del 112 i la policia local.',
 			outputs: [
 				{
 					id: 'incident-output',
-					label: 'Incident payload',
+					label: "Dades de l'incident",
 					color: civicSecondary,
 				},
 			],
@@ -472,20 +534,20 @@ const emergencyBriefNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 360, y: 160 },
 		data: {
-			title: 'Severity Branch',
+			title: 'Bifurcació de severitat',
 			icon: '🧭',
-			status: 'Medium',
+			status: 'Mitjà',
 			inputs: [
 				{
 					id: 'severity-input',
-					label: 'Incident payload',
+					label: "Dades de l'incident",
 					color: civicSecondary,
 				},
 			],
 			outputs: [
-				{ id: 'severity-low', label: 'Low', color: civicSecondary },
-				{ id: 'severity-med', label: 'Medium', color: civicPrimary },
-				{ id: 'severity-high', label: 'High', color: civicTertiary },
+				{ id: 'severity-low', label: 'Baix', color: civicSecondary },
+				{ id: 'severity-med', label: 'Mitjà', color: civicPrimary },
+				{ id: 'severity-high', label: 'Alt', color: civicTertiary },
 			],
 		},
 	},
@@ -494,14 +556,14 @@ const emergencyBriefNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 620, y: 60 },
 		data: {
-			title: 'Geo Context',
+			title: 'Context geogràfic',
 			icon: '🗺️',
-			status: 'Ready',
+			status: 'Llest',
 			inputs: [
-				{ id: 'geo-input', label: 'Low incidents', color: civicSecondary },
+				{ id: 'geo-input', label: 'Incidents baixos', color: civicSecondary },
 			],
 			outputs: [
-				{ id: 'geo-output', label: 'Map overlays', color: civicSecondary },
+				{ id: 'geo-output', label: 'Capes de mapa', color: civicSecondary },
 			],
 		},
 	},
@@ -510,14 +572,14 @@ const emergencyBriefNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 620, y: 220 },
 		data: {
-			title: 'Policy Rules',
+			title: 'Regles de polítiques',
 			icon: '📘',
-			status: 'Resolving ...',
+			status: 'Resolent ...',
 			inputs: [
-				{ id: 'policy-input', label: 'Medium incidents', color: civicPrimary },
+				{ id: 'policy-input', label: 'Incidents mitjans', color: civicPrimary },
 			],
 			outputs: [
-				{ id: 'policy-output', label: 'Playbook', color: civicPrimary },
+				{ id: 'policy-output', label: "Manual d'acció", color: civicPrimary },
 			],
 		},
 	},
@@ -526,14 +588,18 @@ const emergencyBriefNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 620, y: 360 },
 		data: {
-			title: 'Crisis Ops Escalation',
+			title: "Escalada d'operacions de crisi",
 			icon: '🛡️',
-			status: 'Idle',
+			status: 'Inactiu',
 			inputs: [
-				{ id: 'crisis-input', label: 'High incidents', color: civicTertiary },
+				{ id: 'crisis-input', label: 'Incidents alts', color: civicTertiary },
 			],
 			outputs: [
-				{ id: 'crisis-output', label: 'Tasking', color: civicTertiary },
+				{
+					id: 'crisis-output',
+					label: 'Assignació de tasques',
+					color: civicTertiary,
+				},
 			],
 		},
 	},
@@ -542,16 +608,24 @@ const emergencyBriefNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 900, y: 200 },
 		data: {
-			title: 'Multilingual Brief',
+			title: 'Informe multilingüe',
 			icon: '🌐',
 			status: 'CAT / SPA / ENG',
 			inputs: [
-				{ id: 'brief-geo', label: 'Map overlays', color: civicSecondary },
-				{ id: 'brief-policy', label: 'Playbook', color: civicPrimary },
-				{ id: 'brief-crisis', label: 'Tasking', color: civicTertiary },
+				{ id: 'brief-geo', label: 'Capes de mapa', color: civicSecondary },
+				{ id: 'brief-policy', label: "Manual d'acció", color: civicPrimary },
+				{
+					id: 'brief-crisis',
+					label: 'Assignació de tasques',
+					color: civicTertiary,
+				},
 			],
 			outputs: [
-				{ id: 'brief-output', label: 'SMS + Email', color: civicSecondary },
+				{
+					id: 'brief-output',
+					label: 'SMS + Correu electrònic',
+					color: civicSecondary,
+				},
 			],
 		},
 	},
@@ -629,12 +703,17 @@ const urbanPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 80, y: 160 },
 		data: {
-			title: 'Mobility Ingest',
+			title: 'Ingesta de mobilitat',
 			icon: '🚌',
-			status: 'Streaming',
-			description: 'Reads mobility sensors, bike docks, and traffic cams.',
+			status: 'En streaming',
+			description:
+				'Llegeix sensors de mobilitat, estacions de bicicletes i càmeres de trànsit.',
 			outputs: [
-				{ id: 'sensor-output', label: 'Mobility data', color: civicSecondary },
+				{
+					id: 'sensor-output',
+					label: 'Dades de mobilitat',
+					color: civicSecondary,
+				},
 			],
 		},
 	},
@@ -643,11 +722,11 @@ const urbanPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 80, y: 320 },
 		data: {
-			title: 'Citizen Survey Sync',
+			title: "Sincronització d'enquestes ciutadanes",
 			icon: '🗳️',
-			status: 'Weekly',
+			status: 'Setmanal',
 			outputs: [
-				{ id: 'survey-output', label: 'Survey data', color: civicPrimary },
+				{ id: 'survey-output', label: "Dades d'enquesta", color: civicPrimary },
 			],
 		},
 	},
@@ -656,15 +735,23 @@ const urbanPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 360, y: 220 },
 		data: {
-			title: 'Feature Lab',
+			title: 'Laboratori de característiques',
 			icon: '🧪',
-			status: 'Mixing',
+			status: 'Barrejant',
 			inputs: [
-				{ id: 'lab-mobility', label: 'Mobility data', color: civicSecondary },
-				{ id: 'lab-survey', label: 'Survey data', color: civicPrimary },
+				{
+					id: 'lab-mobility',
+					label: 'Dades de mobilitat',
+					color: civicSecondary,
+				},
+				{ id: 'lab-survey', label: "Dades d'enquesta", color: civicPrimary },
 			],
 			outputs: [
-				{ id: 'lab-output', label: 'Feature set', color: civicSecondary },
+				{
+					id: 'lab-output',
+					label: 'Conjunt de característiques',
+					color: civicSecondary,
+				},
 			],
 		},
 	},
@@ -673,14 +760,18 @@ const urbanPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 640, y: 220 },
 		data: {
-			title: 'Insight Writer',
+			title: "Redactor d'informacions",
 			icon: '✍️',
-			status: '4 highlights',
+			status: '4 punts destacats',
 			inputs: [
-				{ id: 'insight-input', label: 'Feature set', color: civicSecondary },
+				{
+					id: 'insight-input',
+					label: 'Conjunt de característiques',
+					color: civicSecondary,
+				},
 			],
 			outputs: [
-				{ id: 'insight-output', label: 'Narrative', color: civicPrimary },
+				{ id: 'insight-output', label: 'Narrativa', color: civicPrimary },
 			],
 		},
 	},
@@ -689,12 +780,16 @@ const urbanPulseNodes: FlowNode[] = [
 		type: 'custom',
 		position: { x: 920, y: 220 },
 		data: {
-			title: 'Civic Spreadsheet Sync',
+			title: 'Sincronització de full de càlcul cívic',
 			icon: '📊',
-			status: 'Writing rows',
-			inputs: [{ id: 'sheet-input', label: 'Narrative', color: civicPrimary }],
+			status: 'Escrivint files',
+			inputs: [{ id: 'sheet-input', label: 'Narrativa', color: civicPrimary }],
 			outputs: [
-				{ id: 'sheet-output', label: 'Shared grid', color: civicSecondary },
+				{
+					id: 'sheet-output',
+					label: 'Graella compartida',
+					color: civicSecondary,
+				},
 			],
 		},
 	},
@@ -742,51 +837,54 @@ const urbanPulseEdges: FlowEdge[] = [
 export const workflows: WorkflowDefinition[] = [
 	{
 		id: 'tender-scrutinizer',
-		title: 'Tender Scrutinizer',
-		category: 'Procurement intelligence',
+		title: 'Analitzador de licitacions',
+		category: 'Intel·ligència de contractació',
 		summary:
-			'Automates clause extraction, compliance scoring, and legal briefs for tender reviews.',
-		metrics: ['4821 docs indexed', '76% compliance score'],
+			"Automatitza l'extracció de clàusules, la puntuació de compliment i els informes legals per a les revisions de licitacions.",
+		metrics: ['4821 documents indexats', '76% de compliment'],
 		nodes: tenderScrutinizerNodes,
 		edges: tenderScrutinizerEdges,
 	},
 	{
 		id: 'citizen-switchboard',
-		title: 'Citizen Response Switchboard',
-		category: 'Frontdesk automation',
+		title: 'Centraleta de resposta ciutadana',
+		category: "Automatització d'atenció ciutadana",
 		summary:
-			'Detects chat intent and routes each flow to the right data-backed workflow.',
-		metrics: ['<15s resolution', '3 intents auto-routed'],
+			'Detecta la intenció del xat i redirigeix cada flux al procés adequat recolzat en dades.',
+		metrics: ['Resolució <15s', '3 intencions redirigides automàticament'],
 		nodes: citizenSwitchboardNodes,
 		edges: citizenSwitchboardEdges,
 	},
 	{
 		id: 'budget-pulse',
-		title: 'Budget Pulse Analyzer',
-		category: 'Finance oversight',
+		title: 'Analitzador de pols pressupostari',
+		category: 'Supervisió financera',
 		summary:
-			'Combines ERP spend, news sentiment, and KPIs to surface anomalies for finance teams.',
-		metrics: ['2 alerts flagged', 'Nightly digest'],
+			'Combina la despesa ERP, el sentiment noticiari i els KPI per detectar anomalies per als equips financers.',
+		metrics: ['2 alertes destacades', 'Resum nocturn'],
 		nodes: budgetPulseNodes,
 		edges: budgetPulseEdges,
 	},
 	{
 		id: 'emergency-brief',
-		title: 'Emergency Brief Generator',
-		category: 'Crisis response',
+		title: "Generador d'informes d'emergència",
+		category: 'Resposta a crisis',
 		summary:
-			'Turns incident webhooks into multilingual briefings with branching severity.',
-		metrics: ['<60s briefing', 'Tri-language output'],
+			"Transforma webhooks d'incidents en informes multilingües amb branques de severitat.",
+		metrics: ['Informe en <60s', 'Sortida tri-idioma'],
 		nodes: emergencyBriefNodes,
 		edges: emergencyBriefEdges,
 	},
 	{
 		id: 'urban-pulse',
-		title: 'Urban Pulse Insight Mixer',
-		category: 'City analytics',
+		title: "Mesclador d'insights urbans",
+		category: 'Anàlisi urbana',
 		summary:
-			'Mixes mobility sensors and citizen surveys to push insights to the civic spreadsheet.',
-		metrics: ['4 insights/night', 'Grid auto-sync'],
+			'Barreja sensors de mobilitat i enquestes ciutadanes per enviar perspectives a la graella cívica.',
+		metrics: [
+			"4 punts d'informació per nit",
+			'Sincronització automàtica de la graella',
+		],
 		nodes: urbanPulseNodes,
 		edges: urbanPulseEdges,
 	},
